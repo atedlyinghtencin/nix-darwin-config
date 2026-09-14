@@ -1,4 +1,4 @@
-<!-- Generated: 2026-09-13 | Files scanned: 23 | Token estimate: ~700 -->
+<!-- Generated: 2026-09-14 | Files scanned: 24 | Token estimate: ~750 -->
 # Architecture codemap
 
 Single-host nix-darwin flake. No services, no runtime; the "program" is a
@@ -20,21 +20,22 @@ hosts/macbook/default.nix (55)         host, user, nix.enable=false, firewall, t
 └─ modules/darwin/firefox.nix (101)    system.defaults.CustomUserPreferences."org.mozilla.firefox"
    └─ ublock-filters.txt (26)          → 3rdparty uBlock toOverwrite.filters
 nix-homebrew.darwinModules             installs brew from store, rosetta, autoMigrate
-home-manager.darwinModules → modules/home/default.nix (31)
+home-manager.darwinModules → modules/home/default.nix (32)
 ├─ packages.nix (40)   home.packages + fzf/zoxide/direnv
 ├─ zsh.nix (73)        aliases incl. drs/dru; sources ~/.zshrc.local
 ├─ starship.nix (40)
 ├─ git.nix (54)        identity from vars; ssh signing iff vars.sshSigningKey != ""
 ├─ ssh.nix (35)        includes ~/.orbstack/ssh/config, ~/.ssh/config.local; IdentityAgent=1Password
 ├─ vscode.nix (27)     settings.json as store symlink
-└─ wallpaper.nix (31)  + wallpaper/Index.plist; activation after writeBoundary
+├─ wallpaper.nix (31)  + wallpaper/Index.plist; activation after writeBoundary
+└─ firefox-backups.nix (61)  activation: <profile>/bookmarkbackups → ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups
 
 ## Activation order (one root shell, stdin detached; postActivation fragments in module-merge order)
 preActivation   homebrew.nix: brew update (only if bin/brew ∈ /nix/store; failure = warn)
 preActivation   defaults.nix: flag if any dockApps path missing
 userDefaults    nix-darwin writes system.defaults (incl. Firefox policy), restarts Dock
 homebrew        brew bundle --force --quiet; upgrade; cleanup=zap
-postActivation  home-manager: dotfiles (backup *.before-nix-darwin) → wallpaper activation
+postActivation  home-manager: dotfiles (backup *.before-nix-darwin) → wallpaper + firefox-backups activations
 postActivation  defaults.nix: activateSettings -u; rm /Applications/.DS_Store; killall Finder; Dock again if flagged
 postActivation  brew-gc.nix: leaves loop ≤10 → casks --zap → vscode ext loop ≤10 → untap --force
 

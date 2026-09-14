@@ -8,6 +8,7 @@
     ./ssh.nix
     ./wallpaper.nix
     ./vscode.nix
+    ./firefox-backups.nix
   ];
 
   home.username = vars.username;

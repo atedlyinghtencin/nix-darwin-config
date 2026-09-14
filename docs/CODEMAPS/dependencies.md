@@ -1,4 +1,4 @@
-<!-- Generated: 2026-09-13 | Files scanned: 23 | Token estimate: ~500 -->
+<!-- Generated: 2026-09-14 | Files scanned: 24 | Token estimate: ~520 -->
 # Dependencies codemap
 
 ## Flake inputs (unpinned: flake.lock is untracked)
@@ -33,6 +33,7 @@ github.com                    flake inputs, Homebrew taps, actions/checkout
 addons.mozilla.org            add-on install_url
 1Password.app                 ssh agent socket (~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock), op-ssh-sign
 OrbStack                      ~/.orbstack/ssh/config, shell init
+Proton Drive.app              ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups (symlink target)
 macOS private API             activateSettings -u, plutil, defaults, killall Dock/Finder/WallpaperAgent
 
 ## Tooling for the scripts

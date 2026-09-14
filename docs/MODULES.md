@@ -153,7 +153,7 @@ run `drs` instead. Currently a Reddit login-upsell blocker.
 
 ## modules/home/default.nix
 
-home-manager entry. Imports the seven user modules, sets `home.username` and
+home-manager entry. Imports the eight user modules, sets `home.username` and
 `home.homeDirectory` from `vars`, session variables (`EDITOR=vim`,
 `VISUAL=code --wait`, `PAGER=less -R`), creates `~/Pictures/Screenshots`
 (macOS silently falls back to the Desktop if the declared folder is missing),
@@ -233,6 +233,28 @@ a byte comparison would restart it every time), and when it differs copies
 the file in, makes it writable for the agent, and restarts WallpaperAgent.
 A declared file without that key path fails the activation with a message to
 re-capture with all Spaces linked.
+
+## modules/home/firefox-backups.nix
+
+Firefox writes a compressed JSON snapshot of all bookmarks into
+`<profile>/bookmarkbackups` once a day (idle time, or shutdown if it hasn't
+happened yet), keeping the newest 15. This activation step replaces that
+directory with a symlink to `Firefox/bookmarkbackups` inside the Proton
+Drive folder, so the snapshots are backed up off the machine. One-way;
+restore is manual, see [RUNBOOK.md](RUNBOOK.md#restoring-firefox-bookmarks).
+
+- The default profile is resolved from `profiles.ini` the way Firefox does
+  it: an `[Install*]` section wins, else the `[Profile*]` with `Default=1`.
+- The Proton Drive folder is found by the pattern
+  `~/Library/CloudStorage/ProtonDrive-*`, so the account name stays out of
+  the repo.
+- Skipped with a message until Firefox and Proton Drive have each been
+  launched once, or if the resolved profile directory is missing.
+- The first link is only made while Firefox is closed; snapshots already in
+  the profile are copied across first (never overwriting a newer copy).
+- Idempotent: an existing correct symlink means no output and no changes.
+
+History, logins and open tabs stay in the profile and are not backed up.
 
 ## .github/workflows/ci.yml
 

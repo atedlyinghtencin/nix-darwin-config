@@ -27,6 +27,7 @@ modules/home/
   vscode.nix               VS Code settings.json (extensions live in homebrew.nix)
   wallpaper.nix            wallpaper store file, installed when the choice differs
   wallpaper/Index.plist    the captured wallpaper choice (Black, gradient)
+  firefox-backups.nix      Firefox's daily bookmark snapshots land in Proton Drive
 scripts/
   collect-mac-facts.sh     read-only capture of the Mac's state into mac-facts/
   firefox_facts.py         read-only capture of Firefox add-ons + prefs as a firefox.nix draft
@@ -97,6 +98,8 @@ a known-good state instead, remove `flake.lock` from `.gitignore` and commit it.
 - **uBlock Origin custom filter** → `modules/darwin/ublock-filters.txt` (one filter
   per line; overwrites the "My filters" pane on every Firefox launch)
 - **Wallpaper** → pick it in System Settings, re-capture, replace `modules/home/wallpaper/Index.plist`
+- **Firefox bookmarks** → backed up to Proton Drive daily by `modules/home/firefox-backups.nix`;
+  restore is a few clicks in Firefox, see [docs/RUNBOOK.md](docs/RUNBOOK.md#restoring-firefox-bookmarks)
 - **Secrets / work-only config** → `~/.zshrc.local`, `~/.gitconfig.local`,
   `~/.ssh/config.local` (private hosts) — sourced if present, never tracked.
   Generic ssh options live in `modules/home/ssh.nix`; host names and users
@@ -118,6 +121,7 @@ for each is in [docs/DECISIONS.md](docs/DECISIONS.md).
 | `sudo -H` for rebuilds | Nix warns when `$HOME` isn't owned by root otherwise. |
 | SSH keys and commit signing through 1Password, no GPG | One agent for every key, unlocked by Touch ID; nothing secret in `~/.ssh` or `~/.gnupg` to back up. Set `sshSigningKey` in `flake.nix` to turn signing on. |
 | VS Code settings declared, extensions via Homebrew, Copilot off | Every editor change goes through the repo; `brew bundle` installs extensions and `brew-gc.nix` removes the rest. |
+| Firefox bookmarks backed up to Proton Drive, restored by hand | Firefox already snapshots bookmarks daily; a symlink sends them off-machine with no account, no Sync and no live database on a synced folder. |
 | CI only evaluates and builds, never activates | Catches Nix errors on every push; behaviour (Homebrew, defaults, Firefox) is verified in a tart VM. |
 
 ## Notes

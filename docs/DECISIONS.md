@@ -151,3 +151,17 @@ repo contains no ssh host names or users.
 `bootstrap.sh`, CI and the `drs` alias all use `#redxiii`, read from the
 one `hostname` line in `flake.nix`. A machine that macOS renamed after a LAN
 clash still builds, and the switch renames it back.
+
+## 2026-09-14 Firefox bookmarks backed up to Proton Drive, restored by hand
+
+**Context.** Bookmarks live in `places.sqlite` inside the profile. Moving
+the profile onto a synced folder risks corrupting a live SQLite database
+under Proton Drive's File Provider, and Firefox Sync needs a Mozilla account.
+**Decision.** Leave the profile alone and redirect only Firefox's own daily
+`bookmarkbackups` snapshots into Proton Drive through a symlink
+(`modules/home/firefox-backups.nix`). One-way: restore is a few clicks in
+Firefox, documented in the runbook. The Proton Drive folder is found by
+pattern so the account name stays out of the repo.
+**Consequence.** Up to 15 dated snapshots are always off-machine; history,
+logins and tabs are not covered. Firefox's own retention deletes old
+snapshots from Proton Drive too.

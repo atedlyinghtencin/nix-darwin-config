@@ -93,8 +93,26 @@ file are in [SCRIPTS.md](SCRIPTS.md).
 | change the prompt | `modules/home/starship.nix` |
 | change a git default | `modules/home/git.nix` |
 | add a generic ssh option | `modules/home/ssh.nix`; host blocks go in `~/.ssh/config.local` |
+| change where Firefox bookmark backups go | `modules/home/firefox-backups.nix` (restore steps below) |
 | change the wallpaper | pick it in System Settings, run `collect-mac-facts.sh`, copy `mac-facts/wallpaper-index.plist` over `modules/home/wallpaper/Index.plist` |
 | keep a secret or work-only setting | `~/.zshrc.local`, `~/.gitconfig.local`, `~/.ssh/config.local` (never tracked) |
+
+## Restoring Firefox bookmarks
+
+Firefox snapshots its bookmarks once a day into `Firefox/bookmarkbackups`
+in Proton Drive (see `modules/home/firefox-backups.nix`). Nothing restores
+automatically; on a fresh machine or after a mistake:
+
+1. Make sure Proton Drive is signed in and the folder has synced.
+2. In Firefox: Bookmarks → Manage Bookmarks (⌘⇧O).
+3. Import and Backup → Restore. Dated entries are the snapshots Firefox can
+   see through the symlink; "Choose File…" lets you pick any `.jsonlz4` from
+   Proton Drive, for example one made by a different Mac.
+4. Confirm. The restore replaces all current bookmarks with the snapshot.
+
+On a fresh machine the order is: `drs`, launch Firefox once, sign in to
+Proton Drive, `drs` again (the first run skips because neither existed yet),
+then restore.
 
 ## Verifying a change without touching the machine
 
@@ -177,6 +195,20 @@ declared folder is missing. `modules/home/default.nix` creates
 The captured store file was taken while displays or Spaces had different
 wallpapers. In System Settings set the wallpaper with all Spaces linked,
 re-capture, and replace `modules/home/wallpaper/Index.plist`.
+
+**`firefox-backups: … skipping` during `drs`.** Firefox or Proton Drive has
+not been launched on this machine yet, or the profile `profiles.ini` names
+is missing. Launch the missing app, sign in, and run `drs` again.
+
+**`firefox-backups: quit Firefox and run drs again`.** The first link is
+only made while Firefox is closed, so a snapshot in flight can't be lost.
+Quit Firefox (⌘Q, not just close the window) and rebuild.
+
+**Bookmark snapshots stopped appearing in Proton Drive.** Firefox only
+writes a new snapshot when bookmarks changed since the last one, and only
+during idle time or a clean quit. Check `<profile>/bookmarkbackups` is
+still a symlink (`readlink`); a Firefox profile reset recreates it as a
+plain directory, and the next `drs` fixes that.
 
 **Nix was installed with the official installer, not Determinate.** Set
 `nix.enable = true` in `hosts/macbook/default.nix` so nix-darwin manages
