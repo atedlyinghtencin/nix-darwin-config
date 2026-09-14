@@ -1,0 +1,10 @@
+result
+result-*
+# rolling policy: dru, a fresh clone and CI resolve inputs to latest (see README)
+flake.lock
+.direnv/
+.DS_Store
+mac-facts/
+__pycache__/
+# generated codemap reports (docs/CODEMAPS/ is the tracked output)
+.reports/

@@ -1,0 +1,41 @@
+# Evaluate and build the nix-darwin system closure on a hosted macOS runner on
+# every push and pull request. This catches Nix syntax errors, unknown options
+# and type errors without a VM. It never activates anything: no `brew bundle`,
+# no `defaults write`, no home-manager switch. Those still need the tart VM.
+#
+# flake.lock is untracked (rolling policy, see README), so each run also proves
+# that the inputs still resolve and build from their latest revisions.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# The job only reads the checkout; it never needs to write to the repo.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: nix build (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      # Same lookup bootstrap.sh uses, so the configuration name has one
+      # source of truth: the vars block in flake.nix.
+      - name: Build the system closure
+        run: |
+          host="$(sed -n 's/^[[:space:]]*hostname = "\(.*\)";.*/\1/p' flake.nix)"
+          test -n "$host"
+          nix build ".#darwinConfigurations.${host}.system" --no-link --print-build-logs

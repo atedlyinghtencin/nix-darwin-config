@@ -1,0 +1,192 @@
+# Runbook
+
+Operating the machine from this repo. Every command below runs in macOS
+Terminal on the Mac itself unless it says otherwise.
+
+## Everyday
+
+| Task | Command |
+|---|---|
+| Apply the repo to the machine | `drs` |
+| Update all flake inputs, then apply | `dru` |
+| See what changed in the inputs | `git -C ~/.config/nix-darwin diff` (the lock file is untracked, so compare `nix flake metadata` before and after instead) |
+| List generations | `darwin-rebuild --list-generations` |
+| Undo the last switch | `sudo darwin-rebuild switch --rollback` |
+| Format all `.nix` files | `nix fmt` (in the repo) |
+| Free disk space | `sudo nix-collect-garbage --delete-older-than 30d` |
+
+`drs` and `dru` are aliases from `modules/home/zsh.nix`; they only exist
+once the first switch has run. Before that, use the command `bootstrap.sh`
+prints, or:
+
+```sh
+sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
+```
+
+## Fresh machine
+
+1. Edit the `vars` block in `flake.nix` if this is a different Mac
+   (`whoami`, `scutil --get LocalHostName`, `scutil --get ComputerName`).
+2. Sign in to the Mac App Store if `masApps` lists anything.
+3. Clone and run the installer:
+
+   ```sh
+   git clone <this repo> ~/.config/nix-darwin
+   cd ~/.config/nix-darwin
+   ./bootstrap.sh
+   ```
+
+   It installs the Xcode Command Line Tools (accept the dialog), Nix via the
+   Determinate installer, then builds and activates. The first run downloads
+   and installs everything Homebrew, so it takes a while.
+4. Open a new terminal so the declared zsh config and aliases load.
+5. Open 1Password, sign in, and turn on Settings → Developer → "Use the SSH
+   agent". Add your private SSH hosts to `~/.ssh/config.local`.
+6. Optional: to sign commits, copy the key's public half from 1Password into
+   `sshSigningKey` in `flake.nix`, run `drs`, and add the same public key to
+   GitHub as a *signing* key.
+7. Launch Firefox once: the policy installs the three add-ons and applies
+   the prefs on first start.
+
+## Adopting a Mac that already has stuff on it
+
+- Existing dotfiles that home-manager wants to own are moved aside as
+  `<name>.before-nix-darwin`, not overwritten. Diff them against the
+  declared versions, move anything private into the `.local` files, then
+  delete the backups.
+- An existing `/opt/homebrew` is adopted by nix-homebrew (`autoMigrate`).
+- **`cleanup = "zap"` removes every cask and formula that is not declared,
+  and `brew-gc.nix` makes sure that really happens.** Capture the machine
+  first (`./scripts/collect-mac-facts.sh`), merge what you want to keep into
+  `homebrew.nix`, or set `cleanup = "none"` for the first switch.
+- The screensaver, Finder, Dock, trackpad and text-input settings are all
+  overwritten by `defaults.nix`. Capture first if you care about the
+  current values.
+
+## Re-capturing machine state
+
+```sh
+./scripts/collect-mac-facts.sh     # everything except Firefox
+./scripts/firefox_facts.py         # Firefox add-ons and prefs
+```
+
+Both write into the gitignored `mac-facts/`. Merge by hand into the module
+that owns the setting (see [MODULES.md](MODULES.md)), update the "captured"
+date in that module's header comment, run `drs`. Details of every output
+file are in [SCRIPTS.md](SCRIPTS.md).
+
+## Where a change goes
+
+| I want to… | Edit |
+|---|---|
+| add a CLI tool | `modules/home/packages.nix` (search at search.nixos.org first) |
+| add a GUI app | `casks` in `modules/darwin/homebrew.nix` |
+| add a formula that needs macOS integration | `brews` in `homebrew.nix` |
+| add an App Store app | `masApps` (`mas search <name>` for the id) |
+| add or remove a VS Code extension | `vscode` in `homebrew.nix` |
+| change a VS Code setting | `modules/home/vscode.nix` (the Settings UI can't save) |
+| change a macOS preference (Dock, Finder, trackpad, text input, screenshots, lock) | `modules/darwin/defaults.nix` (options: nix-darwin manual) |
+| pin or reorder Dock apps | `dockApps` in `defaults.nix` |
+| change a Firefox setting or add-on | `modules/darwin/firefox.nix` |
+| add a uBlock Origin filter | `modules/darwin/ublock-filters.txt` |
+| add a shell alias or function | `modules/home/zsh.nix` |
+| change the prompt | `modules/home/starship.nix` |
+| change a git default | `modules/home/git.nix` |
+| add a generic ssh option | `modules/home/ssh.nix`; host blocks go in `~/.ssh/config.local` |
+| change the wallpaper | pick it in System Settings, run `collect-mac-facts.sh`, copy `mac-facts/wallpaper-index.plist` over `modules/home/wallpaper/Index.plist` |
+| keep a secret or work-only setting | `~/.zshrc.local`, `~/.gitconfig.local`, `~/.ssh/config.local` (never tracked) |
+
+## Verifying a change without touching the machine
+
+- **CI** builds the system closure on a hosted macOS runner for every push
+  and pull request. Green means it evaluates and builds; it says nothing
+  about what activation does.
+- **Locally on a Mac**, the same check is
+  `nix build .#darwinConfigurations.redxiii.system --no-link`.
+- **Behaviour** (Homebrew, defaults, Firefox policy, Dock) is verified in a
+  tart VM: install a macOS image, clone the repo inside it, run
+  `./bootstrap.sh`, and look. The VM's hostname may end in `-2`; the
+  configuration is still addressed as `#redxiii` and builds regardless.
+- The Python scripts have unit tests that run anywhere:
+  `python3 -m unittest discover -s scripts`.
+
+## When inputs roll forward and break
+
+`flake.lock` is untracked, so a `dru` (or a fresh clone) can pull an upstream
+change that fails to evaluate or misbehaves.
+
+1. `sudo darwin-rebuild switch --rollback` gets the machine back.
+2. To keep working while upstream fixes it, pin the offending input in
+   `flake.nix` temporarily, for example
+   `nixpkgs.url = "github:NixOS/nixpkgs/<known-good-commit>";`, run `drs`,
+   and revert the pin later.
+3. To stop rolling for good, delete the `flake.lock` line from `.gitignore`
+   and commit the lock file; `dru` then becomes the only way inputs move.
+
+## Troubleshooting
+
+**The rebuild stops and waits for input.** It should not: `drs` and
+`bootstrap.sh` detach stdin so Homebrew's y/n prompts take their default.
+If you ran `darwin-rebuild` by hand, add `< /dev/null`. `sudo` still asks
+for the password via `/dev/tty`.
+
+**`brew untap` reports a tap with stuck formulae.** Homebrew's untap
+ignores `HOMEBREW_NO_ASK`. `brew-gc.nix` uses `untap --force`, which never
+prompts; if a tap still survives, run `brew untap --force <tap>` once.
+
+**`warning: brew update failed; continuing with the current index`.**
+Network or GitHub hiccup while refreshing Homebrew's index. The rebuild
+continues with the old index; re-run `drs` later.
+
+**`brew bundle` says "VSCode is not installed" or can't find `mas`.** This
+is what happens when `brew bundle` auto-updates and re-execs itself under
+nix-homebrew's launcher. `homebrew.onActivation.autoUpdate` must stay
+`false`; the index is refreshed in preActivation instead.
+
+**Question-mark tiles in the Dock after the first run.** nix-darwin restarts
+the Dock before Homebrew installs the pinned casks. `defaults.nix` restarts
+it a second time when that happened; if a tile is still `?`, `killall Dock`.
+
+**Finder windows disappear during `drs`.** Expected: Finder is restarted so
+it picks up the declared view settings.
+
+**"Nix warns that $HOME is not owned by root".** Run the rebuild with
+`sudo -H`, as `drs` does.
+
+**Activation fails because a file in `~` already exists.** Home-manager is
+configured to back files up as `*.before-nix-darwin` rather than abort, so
+this should not happen. If a backup from an earlier run is in the way,
+delete it and re-run.
+
+**Firefox ignores a new setting.** Policies apply on the next launch; quit
+Firefox fully (⌘Q) and reopen. `about:policies` shows what is active and
+flags errors. Prefs the `Preferences` policy refuses are listed in the
+module header and in `mac-facts/firefox-prefs.txt`.
+
+**Edits in uBlock Origin's "My filters" vanish.** The pane is overwritten
+from `ublock-filters.txt` at every launch. Edit the file, `drs`, relaunch.
+
+**VS Code says settings.json is read-only.** It is a symlink into the Nix
+store. Change `modules/home/vscode.nix` and rebuild.
+
+**Screenshots land on the Desktop.** macOS falls back silently when the
+declared folder is missing. `modules/home/default.nix` creates
+`~/Pictures/Screenshots`; if it was deleted, run `drs`.
+
+**`wallpaper: declared Index.plist has no AllSpacesAndDisplays.Linked.Content`.**
+The captured store file was taken while displays or Spaces had different
+wallpapers. In System Settings set the wallpaper with all Spaces linked,
+re-capture, and replace `modules/home/wallpaper/Index.plist`.
+
+**Nix was installed with the official installer, not Determinate.** Set
+`nix.enable = true` in `hosts/macbook/default.nix` so nix-darwin manages
+the daemon and `nix.conf`.
+
+**Commits are not "Verified" on GitHub.** `sshSigningKey` must be non-empty
+in `flake.nix`, 1Password's SSH agent must be on, and the same public key
+must be added to GitHub as a signing key (not only an authentication key).
+`git log --show-signature -1` shows whether signing happened locally.
+
+**The machine's name changed (for example to `redxiii-2`).** A LAN name
+clash made macOS rename it. `drs` still builds because the configuration
+is addressed by name, and the switch sets `networking.hostName` back.

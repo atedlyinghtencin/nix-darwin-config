@@ -1,0 +1,26 @@
+! uBlock Origin "My filters". Pushed into the extension by firefox.nix at every
+! Firefox launch (toOverwrite.filters), so edits made in uBlock's dashboard are
+! lost on the next start: change this file instead.
+
+! =========================================================
+! REDDIT: SURGICAL LOGIN BLOCKER (PRESERVES POST LIGHTBOXES)
+! =========================================================
+
+! --- 1. Target ONLY the login upsell elements ---
+www.reddit.com##desktop-dynamic-upsell-modal
+www.reddit.com###desktop-dynamic-upsell-dialog
+www.reddit.com##rpl-dialog-sheet[id="desktop-dynamic-upsell"]
+www.reddit.com##shreddit-async-loader[bundlename="login_modal"]
+www.reddit.com##shreddit-experience-tree[name="login_modal"]
+
+! --- 2. Custom Layout Cleanups ---
+www.reddit.com##.overflow-hidden.relative.p-md.bg-neutral-background-weak.rounded-4.m-md.w-\[251px\].h-\[calc\(100vh-64px-56px\)\].flex-col.flex
+www.reddit.com##.p-lg.justify-center.items-center.flex-col.w-1\/2.flex
+www.reddit.com##.w-\[720px\].min-h-\[480px\].flex
+
+! --- 3. Unfreeze Scrollbar ---
+www.reddit.com##html:style(overflow: auto !important;)
+www.reddit.com##body:style(overflow: auto !important;)
+www.reddit.com##+js(rc, scroll-is-blocked, body, stay)
+www.reddit.com##+js(rc, rpl-scroll-lock, html, stay)
+www.reddit.com##+js(rc, rpl-scroll-lock, body, stay)
