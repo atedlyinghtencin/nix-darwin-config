@@ -110,7 +110,10 @@ in
 
     # "Displays have separate Spaces" OFF: the Dock and menu bar stay on the
     # main display instead of following the pointer to whichever monitor it
-    # touches the bottom of. Takes effect after the next login.
+    # touches the bottom of. nix-darwin's naming is inverted relative to
+    # System Settings: true means one Space spans all displays. Written on
+    # every rebuild, but macOS only reads it at login, so a logout is needed
+    # once (README, manual steps).
     spaces.spans-displays = true;
 
     CustomUserPreferences = {

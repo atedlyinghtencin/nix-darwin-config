@@ -206,6 +206,12 @@ nix-homebrew's launcher. `homebrew.onActivation.autoUpdate` must stay
 the Dock before Homebrew installs the pinned casks. `defaults.nix` restarts
 it a second time when that happened; if a tile is still `?`, `killall Dock`.
 
+**The Dock jumps to whichever display the pointer is on.** "Displays have
+separate Spaces" is still on for this session. `defaults.nix` sets
+`spaces.spans-displays = true` (nix-darwin's inverted name: true means one
+Space spans all displays), but macOS reads it at login. Log out and back
+in. `defaults read com.apple.spaces spans-displays` should print `1`.
+
 **Finder still hides file extensions.** The switch that matters is
 `NSGlobalDomain AppleShowAllExtensions`, declared under `NSGlobalDomain`
 in `defaults.nix` (nix-darwin's `finder.AppleShowAllExtensions` writes

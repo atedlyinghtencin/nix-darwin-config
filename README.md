@@ -122,6 +122,10 @@ on a fresh machine.
   `defaults read com.apple.Safari AutoFillPasswords` (prints `0`).
 - **System Settings > General > AutoFill & Passwords**: enable 1Password,
   disable Passwords (iCloud Keychain).
+- **Log out and back in once**: "Displays have separate Spaces" is turned
+  off by `defaults.nix` (`spaces.spans-displays = true`, nix-darwin's
+  inverted name), which stops the Dock from jumping to whichever display
+  the pointer is on. macOS only reads it at login.
 - **Terminal profile**: the first rebuild imports the `nix-darwin` profile
   (Clear Dark colours, JetBrainsMono Nerd Font 12 pt, 120 x 30) by opening
   it, which opens one extra Terminal window; close it. Windows that were
