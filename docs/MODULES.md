@@ -145,7 +145,7 @@ Written into the `org.mozilla.firefox` defaults domain, which the Homebrew
 cask reads as enterprise policy on next launch (check `about:policies`).
 
 - `EnterprisePoliciesEnabled`, `DisableTelemetry`
-- `ExtensionSettings`: Proton Pass, OneTab, uBlock Origin, all
+- `ExtensionSettings`: 1Password, Proton Pass, OneTab, uBlock Origin, all
   `normal_installed` (auto-installed, user can disable but not remove) with
   `default_area = "menupanel"` so a fresh profile keeps the buttons under the
   extensions menu

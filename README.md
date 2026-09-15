@@ -92,8 +92,14 @@ on a fresh machine.
   Private host blocks go in `~/.ssh/config.local` (see below). To sign
   commits, put the key's public half in `sshSigningKey` in `flake.nix`, run
   `drs`, and add the same key to GitHub as a signing key.
-- **Firefox**: launch it once. The policy installs the add-ons and applies
-  the prefs on first start.
+- **Firefox**: launch it once. The policy installs the add-ons (1Password,
+  Proton Pass, OneTab, uBlock Origin) and applies the prefs on first start.
+  After any rebuild that changes `firefox.nix`, quit Firefox fully (⌘Q)
+  and relaunch; policies are read at startup. 1Password and Proton Pass
+  each need a one-time sign-in in the extension.
+- **Proton Pass extension, first launch**: Settings > disable Autofill,
+  Autosave, Autosuggest, and Passkeys. These are stored in the extension
+  and cannot be set by this config.
 - **Default browser**: the first rebuild after Firefox is installed runs
   `defaultbrowser firefox`, and macOS asks "Do you want to change your
   default web browser?" once. Accept it. That dialog cannot be suppressed

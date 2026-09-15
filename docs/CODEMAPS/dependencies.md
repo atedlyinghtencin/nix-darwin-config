@@ -22,7 +22,7 @@ vscode   mechatroner.rainbow-csv ms-python.{debugpy,python,vscode-pylance,vscode
 mas      (none)
 
 ## Firefox policy (modules/darwin/firefox.nix)
-add-ons  Proton Pass, OneTab, uBlock Origin  ← addons.mozilla.org latest.xpi, normal_installed, menupanel
+add-ons  1Password, Proton Pass, OneTab, uBlock Origin  ← addons.mozilla.org latest.xpi, normal_installed, menupanel
 prefs    43 via Preferences policy (2 locked: browser.ipProtection.enabled, identity.fxaccounts.toolbar.enabled)
 filters  ublock-filters.txt → 3rdparty.Extensions.uBlock0.toOverwrite.filters
 
