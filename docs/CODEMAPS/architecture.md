@@ -28,14 +28,15 @@ home-manager.darwinModules → modules/home/default.nix (32)
 ├─ ssh.nix (35)        includes ~/.orbstack/ssh/config, ~/.ssh/config.local; IdentityAgent=1Password
 ├─ vscode.nix (27)     settings.json as store symlink
 ├─ wallpaper.nix (31)  + wallpaper/Index.plist; activation after writeBoundary
-└─ firefox-backups.nix (61)  activation: <profile>/bookmarkbackups → ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups
+├─ firefox-backups.nix (61)  activation: <profile>/bookmarkbackups → ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups
+└─ default-browser.nix (33)  activation: defaultbrowser firefox unless already '* firefox'
 
 ## Activation order (one root shell, stdin detached; postActivation fragments in module-merge order)
 preActivation   homebrew.nix: brew update (only if bin/brew ∈ /nix/store; failure = warn)
 preActivation   defaults.nix: flag if any dockApps path missing
 userDefaults    nix-darwin writes system.defaults (incl. Firefox policy), restarts Dock
 homebrew        brew bundle --force --quiet; upgrade; cleanup=zap
-postActivation  home-manager: dotfiles (backup *.before-nix-darwin) → wallpaper + firefox-backups activations
+postActivation  home-manager: dotfiles (backup *.before-nix-darwin) → wallpaper + firefox-backups + default-browser activations
 postActivation  defaults.nix: activateSettings -u; rm /Applications/.DS_Store; killall Finder; Dock again if flagged
 postActivation  brew-gc.nix: leaves loop ≤10 → casks --zap → vscode ext loop ≤10 → untap --force
 

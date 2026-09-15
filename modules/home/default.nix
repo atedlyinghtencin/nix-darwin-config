@@ -9,6 +9,7 @@
     ./wallpaper.nix
     ./vscode.nix
     ./firefox-backups.nix
+    ./default-browser.nix
   ];
 
   home.username = vars.username;

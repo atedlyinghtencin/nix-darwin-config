@@ -272,6 +272,15 @@ restore is manual, see [RUNBOOK.md](RUNBOOK.md#restoring-firefox-bookmarks).
 
 History, logins and open tabs stay in the profile and are not backed up.
 
+## modules/home/default-browser.nix
+
+Installs `defaultbrowser` from nixpkgs and, after `writeBoundary`, runs it
+when Firefox is installed but not marked `*` in its handler list. Skips with
+a message when `/Applications/Firefox.app` is missing or LaunchServices does
+not list Firefox as an HTTP handler yet (before its first launch). macOS
+confirms the change with a one-time dialog; an ignored dialog means the step
+runs again on the next rebuild. Never fails the build.
+
 ## .github/workflows/ci.yml
 
 `nix build .#darwinConfigurations.<host>.system` on `macos-latest` with the

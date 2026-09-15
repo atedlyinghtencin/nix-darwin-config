@@ -99,6 +99,7 @@ file are in [SCRIPTS.md](SCRIPTS.md).
 | change the prompt | `modules/home/starship.nix` |
 | change a git default | `modules/home/git.nix` |
 | add a generic ssh option | `modules/home/ssh.nix`; host blocks go in `~/.ssh/config.local` |
+| change the default browser | `modules/home/default-browser.nix` (Firefox hardcoded; macOS confirms with a dialog) |
 | change where Firefox bookmark backups go | `modules/home/firefox-backups.nix` (restore steps below) |
 | change the wallpaper | pick it in System Settings, run `collect-mac-facts.sh`, copy `mac-facts/wallpaper-index.plist` over `modules/home/wallpaper/Index.plist` |
 | keep a secret or work-only setting | `~/.zshrc.local`, `~/.gitconfig.local`, `~/.ssh/config.local` (never tracked) |

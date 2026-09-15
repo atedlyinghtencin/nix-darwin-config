@@ -9,7 +9,7 @@ nix-homebrew   github:zhaofengli/nix-homebrew
 
 ## nixpkgs packages
 system   git curl coreutils nerd-fonts.jetbrains-mono zsh
-user     git wget uv ripgrep fd bat eza jq tree htop gh nixfmt nil
+user     git wget uv ripgrep fd bat eza jq tree htop gh nixfmt nil defaultbrowser
          + programs: fzf zoxide direnv(nix-direnv) starship delta gh home-manager
 
 ## Homebrew (modules/darwin/homebrew.nix)

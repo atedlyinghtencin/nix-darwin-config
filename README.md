@@ -28,6 +28,7 @@ modules/home/
   wallpaper.nix            wallpaper store file, installed when the choice differs
   wallpaper/Index.plist    the captured wallpaper choice (Black, gradient)
   firefox-backups.nix      Firefox's daily bookmark snapshots land in Proton Drive
+  default-browser.nix      Firefox as the default browser, via defaultbrowser (nixpkgs)
 scripts/
   collect-mac-facts.sh     read-only capture of the Mac's state into mac-facts/
   firefox_facts.py         read-only capture of Firefox add-ons + prefs as a firefox.nix draft
@@ -92,6 +93,11 @@ on a fresh machine.
   `drs`, and add the same key to GitHub as a signing key.
 - **Firefox**: launch it once. The policy installs the add-ons and applies
   the prefs on first start.
+- **Default browser**: the first rebuild after Firefox is installed runs
+  `defaultbrowser firefox`, and macOS asks "Do you want to change your
+  default web browser?" once. Accept it. That dialog cannot be suppressed
+  without MDM; if LaunchServices did not know Firefox yet, the step says so
+  and the next `drs` asks again.
 - **Proton Drive**: sign in, then run `drs` again so Firefox's bookmark
   snapshots start landing in it.
 

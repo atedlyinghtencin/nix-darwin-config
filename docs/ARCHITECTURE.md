@@ -33,7 +33,8 @@ flake.nix
             ├── ssh.nix         1Password agent, config.local include
             ├── vscode.nix      settings.json (store symlink)
             ├── wallpaper.nix   wallpaper store file (+ wallpaper/Index.plist)
-            └── firefox-backups.nix  bookmarkbackups → Proton Drive symlink
+            ├── firefox-backups.nix  bookmarkbackups → Proton Drive symlink
+            └── default-browser.nix  defaultbrowser firefox, once
 ```
 
 The configuration is always addressed by its explicit name (`#redxiii`) in
@@ -78,7 +79,7 @@ sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
    | preActivation | `defaults.nix` | Check whether every app pinned to the Dock exists; remember if any is missing. |
    | userDefaults (nix-darwin) | `defaults.nix`, `firefox.nix` | Write every `system.defaults.*` key, including the `org.mozilla.firefox` policy domain, then restart the Dock. |
    | homebrew (nix-darwin) | `homebrew.nix` | `brew bundle --force --quiet`: install taps, formulae, casks, VS Code extensions and mas apps; upgrade; `cleanup = "zap"` removes what is not listed. |
-   | postActivation | home-manager | Write dotfiles into `~` (pre-existing files are moved aside as `*.before-nix-darwin`), then run the wallpaper and Firefox-backup activations. |
+   | postActivation | home-manager | Write dotfiles into `~` (pre-existing files are moved aside as `*.before-nix-darwin`), then run the wallpaper, Firefox-backup and default-browser activations. |
    | postActivation | `defaults.nix` | `activateSettings -u`, delete `/Applications/.DS_Store`, restart Finder, and restart the Dock a second time if a pinned app was only just installed. |
    | postActivation | `brew-gc.nix` | Converge for real: uninstall unmanaged leaf formulae iteratively, unmanaged casks (`--zap`), unmanaged VS Code extensions iteratively, then `untap --force` stray taps. |
 
