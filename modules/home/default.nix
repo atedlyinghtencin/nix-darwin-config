@@ -11,6 +11,7 @@
     ./firefox-backups.nix
     ./default-browser.nix
     ./safari.nix
+    ./terminal.nix
   ];
 
   home.username = vars.username;

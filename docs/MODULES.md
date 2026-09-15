@@ -297,6 +297,21 @@ directory means Safari has never been launched and it skips. Not done
 through `system.defaults.CustomUserPreferences` because nix-darwin's
 activation is `set -e` and a failed write there would abort the rebuild.
 
+## modules/home/terminal.nix and terminal/nix-darwin.terminal
+
+Terminal.app stores a profile's font as an NSKeyedArchiver blob, so the
+profile is a `.terminal` plist. Captured 2026-09-16: the "Clear Dark"
+profile exported from the Mac (16 ANSI colours, translucent blurred
+background, text, bold and selection colours, spacing, 120 x 30, profile
+version 2.09), renamed `nix-darwin` so it never collides with Terminal's
+own Clear Dark, with only the font archive changed from SF Mono 12 pt to
+`JetBrainsMonoNF-Regular` 12 pt. The activation opens the file when
+`defaults read com.apple.Terminal "Window Settings"` lacks the profile
+(registers it, opens one window), then writes `Default Window Settings` and
+`Startup Window Settings` when they differ. Both keys are set here, not via
+`CustomUserPreferences`, so they follow the import. Open windows keep their
+profile.
+
 ## .github/workflows/ci.yml
 
 `nix build .#darwinConfigurations.<host>.system` on `macos-latest` with the

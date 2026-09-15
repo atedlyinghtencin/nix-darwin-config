@@ -30,6 +30,8 @@ modules/home/
   firefox-backups.nix      Firefox's daily bookmark snapshots land in Proton Drive
   default-browser.nix      Firefox as the default browser, via defaultbrowser (nixpkgs)
   safari.nix               Safari AutoFill off (1Password does it); needs Full Disk Access
+  terminal.nix             Terminal.app profile with the Nerd Font, imported once and made the default
+  terminal/nix-darwin.terminal  the exported Clear Dark profile, renamed, with the Nerd Font
 scripts/
   collect-mac-facts.sh     read-only capture of the Mac's state into mac-facts/
   firefox_facts.py         read-only capture of Firefox add-ons + prefs as a firefox.nix draft
@@ -120,6 +122,13 @@ on a fresh machine.
   `defaults read com.apple.Safari AutoFillPasswords` (prints `0`).
 - **System Settings > General > AutoFill & Passwords**: enable 1Password,
   disable Passwords (iCloud Keychain).
+- **Terminal profile**: the first rebuild imports the `nix-darwin` profile
+  (Clear Dark colours, JetBrainsMono Nerd Font 12 pt, 120 x 30) by opening
+  it, which opens one extra Terminal window; close it. Windows that were
+  already open keep the old profile until reopened. To change it, export
+  from Terminal > Settings > Profiles > gear > Export and replace
+  `modules/home/terminal/nix-darwin.terminal`, keeping the name `nix-darwin`
+  and the Nerd Font (see the comment in `modules/home/terminal.nix`).
 
 ## Day to day
 

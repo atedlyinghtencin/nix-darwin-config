@@ -99,6 +99,7 @@ file are in [SCRIPTS.md](SCRIPTS.md).
 | change the prompt | `modules/home/starship.nix` |
 | change a git default | `modules/home/git.nix` |
 | add a generic ssh option | `modules/home/ssh.nix`; host blocks go in `~/.ssh/config.local` |
+| change the Terminal profile (colours, font, window size) | export it over `modules/home/terminal/nix-darwin.terminal`, keep the name `nix-darwin` and the Nerd Font (comment in `terminal.nix`) |
 | change a Safari preference | `modules/home/safari.nix` (needs Full Disk Access for the terminal) |
 | change the default browser | `modules/home/default-browser.nix` (Firefox hardcoded; macOS confirms with a dialog) |
 | change where Firefox bookmark backups go | `modules/home/firefox-backups.nix` (restore steps below) |
