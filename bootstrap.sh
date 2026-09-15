@@ -124,13 +124,22 @@ if ! command -v nix >/dev/null 2>&1; then
   . "$NIX_PROFILE"
 fi
 
-# 3. Put the repo where the `drs` alias expects it
+# 3. Rosetta 2. nix-homebrew's Intel prefix (enableRosetta) and OrbStack's
+# Intel containers need it; without it activation warns "The Intel Homebrew
+# prefix has been set up, but Rosetta isn't installed yet". oahd is
+# Rosetta's daemon and only runs when it is installed.
+if [[ "$(uname -m)" == "arm64" ]] && ! /usr/bin/pgrep -q oahd; then
+  echo "==> Installing Rosetta 2…"
+  sudo softwareupdate --install-rosetta --agree-to-license
+fi
+
+# 4. Put the repo where the `drs` alias expects it
 if [[ "$SRC_DIR" != "$REPO_DIR" && ! -e "$REPO_DIR" ]]; then
   mkdir -p "$(dirname "$REPO_DIR")"
   ln -s "$SRC_DIR" "$REPO_DIR"
 fi
 
-# 4. First build: darwin-rebuild isn't installed yet, so run it from the flake.
+# 5. First build: darwin-rebuild isn't installed yet, so run it from the flake.
 # stdin is detached so nothing downstream can stop and prompt: Homebrew's
 # y/n confirmations (e.g. `brew untap` on a tap with stuck formulae) only
 # fire on a TTY and otherwise take their safe non-interactive default.
