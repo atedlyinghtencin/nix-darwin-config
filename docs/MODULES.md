@@ -32,13 +32,29 @@ home-manager with `useGlobalPkgs`, `useUserPackages` and
 
 ## bootstrap.sh
 
-Fresh-Mac installer, safe to re-run. Refuses to run anywhere but macOS and
-refuses a `CHANGEME` hostname. Installs Xcode Command Line Tools if missing,
-installs Nix with the Determinate installer if missing, symlinks the checkout
-to `~/.config/nix-darwin` if it lives elsewhere, then runs the first
-`darwin-rebuild switch` straight from the nix-darwin flake with stdin
-detached. Reads the hostname out of `flake.nix` with the same `sed` that CI
-uses.
+Fresh-Mac installer, safe to re-run: every step checks its own
+precondition, so a second run only rebuilds. In order:
+
+- refuses anything but macOS, running as root, and a `CHANGEME` hostname;
+  warns when the checkout has no `flake.lock`
+- reads `username` and `hostname` out of `flake.nix` with the same `sed`
+  CI uses; a username that differs from `id -un` is fatal (both values and
+  both fixes are printed), a hostname that differs from
+  `scutil --get LocalHostName` is a warning
+- `sudo -v`, then a background loop refreshes the credential every 60 s so
+  casks that need root never prompt mid-run; the EXIT trap kills the loop
+  and runs `stty sane`
+- Xcode Command Line Tools if missing
+- Nix via the Determinate installer if missing, after two preflight checks:
+  `/etc/synthetic.conf` declares `nix` but `/nix` does not exist (reboot
+  needed), or a "Nix Store" APFS volume exists with nothing mounted on
+  `/nix` (prints the `diskutil apfs deleteVolume` and
+  `security delete-generic-password` cleanup). The Nix profile is sourced
+  first so a re-run does not mistake an installed Nix for a missing one
+- Rosetta 2 via `softwareupdate` when `oahd` is not running (Apple Silicon)
+- symlinks the checkout to `~/.config/nix-darwin` if it lives elsewhere
+- the first `darwin-rebuild switch` straight from the nix-darwin flake, as
+  root with stdin detached
 
 ## hosts/macbook/default.nix
 

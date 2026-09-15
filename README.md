@@ -47,11 +47,19 @@ docs/                      architecture, module reference, runbook, scripts, dec
 | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | you are making a change and want the checklist |
 | [docs/CODEMAPS/](docs/CODEMAPS/) | token-lean maps of the module graph and dependencies, for AI context |
 
-## Fresh machine
+## Fresh install
 
-1. `vars` in `flake.nix` is already filled in for this machine; edit it for a different one.
-2. Sign in to the Mac App Store if you use `masApps`.
-3. Run:
+Before you start:
+
+- The macOS account name must equal `username` in `flake.nix` (`whoami`).
+  `bootstrap.sh` stops with both values if they differ; either edit the
+  `vars` block or rename the account.
+- Run `bootstrap.sh` as that user, never with `sudo`. It asks for your
+  password once, keeps the credential fresh for the whole run, and escalates
+  on its own where it has to.
+- Sign in to the Mac App Store first if `masApps` lists anything.
+
+1. Clone and run:
 
    ```sh
    git clone <this repo> ~/.config/nix-darwin
@@ -59,12 +67,33 @@ docs/                      architecture, module reference, runbook, scripts, dec
    ./bootstrap.sh
    ```
 
-4. Open a new terminal.
-5. Sign in to 1Password and turn on Settings → Developer → "Use the SSH agent".
-   Drop private host blocks in `~/.ssh/config.local` (see below).
+2. If it stops with "Reboot, then run ./bootstrap.sh again", do exactly
+   that. The Nix installer declared the `/nix` firmlink, and on a fresh
+   macOS the firmlink only appears at the next boot. The second run installs
+   Nix, then Rosetta 2 if it is missing, and builds.
+3. When it prints "Done", open a new terminal so the declared shell, the
+   `drs` alias and the Nerd Font profile load.
+4. Work through [Manual steps after first bootstrap](#manual-steps-after-first-bootstrap).
 
-Step by step, including adopting a Mac that already has software on it, in
-[docs/RUNBOOK.md](docs/RUNBOOK.md#fresh-machine).
+From then on every change is `drs`. A rebuild that installs a cask whose
+installer needs root asks for your password in the middle of the run; run
+`sudo -v` right before `drs` so the credential is fresh, or type it when
+asked. Details, adopting a Mac that already has software on it, and
+troubleshooting in [docs/RUNBOOK.md](docs/RUNBOOK.md#fresh-machine).
+
+## Manual steps after first bootstrap
+
+What macOS and the apps do not let this repo set. Each is a one-time step
+on a fresh machine.
+
+- **1Password**: sign in, then Settings > Developer > "Use the SSH agent".
+  Private host blocks go in `~/.ssh/config.local` (see below). To sign
+  commits, put the key's public half in `sshSigningKey` in `flake.nix`, run
+  `drs`, and add the same key to GitHub as a signing key.
+- **Firefox**: launch it once. The policy installs the add-ons and applies
+  the prefs on first start.
+- **Proton Drive**: sign in, then run `drs` again so Firefox's bookmark
+  snapshots start landing in it.
 
 ## Day to day
 

@@ -27,8 +27,11 @@ sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
 
 1. Edit the `vars` block in `flake.nix` if this is a different Mac
    (`whoami`, `scutil --get LocalHostName`, `scutil --get ComputerName`).
+   `username` must equal the macOS account name; `bootstrap.sh` refuses to
+   build otherwise, and warns (only) when the hostname differs, since the
+   build renames the machine.
 2. Sign in to the Mac App Store if `masApps` lists anything.
-3. Clone and run the installer:
+3. Clone and run the installer as the normal user (it refuses `sudo`):
 
    ```sh
    git clone <this repo> ~/.config/nix-darwin
@@ -36,17 +39,20 @@ sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
    ./bootstrap.sh
    ```
 
-   It installs the Xcode Command Line Tools (accept the dialog), Nix via the
-   Determinate installer, then builds and activates. The first run downloads
-   and installs everything Homebrew, so it takes a while.
-4. Open a new terminal so the declared zsh config and aliases load.
-5. Open 1Password, sign in, and turn on Settings → Developer → "Use the SSH
-   agent". Add your private SSH hosts to `~/.ssh/config.local`.
-6. Optional: to sign commits, copy the key's public half from 1Password into
-   `sshSigningKey` in `flake.nix`, run `drs`, and add the same public key to
-   GitHub as a *signing* key.
-7. Launch Firefox once: the policy installs the three add-ons and applies
-   the prefs on first start.
+   It asks for your password once and keeps sudo alive for the run, installs
+   the Xcode Command Line Tools (accept the dialog), Nix via the Determinate
+   installer, Rosetta 2 if missing, then builds and activates. The first run
+   downloads and installs everything Homebrew, so it takes a while.
+4. If the script stops with "Reboot, then run ./bootstrap.sh again": the
+   installer declared the `/nix` firmlink in `/etc/synthetic.conf`, and on a
+   fresh macOS the firmlink only appears at the next boot. Reboot and re-run.
+   If it instead reports a leftover "Nix Store" volume, run the `diskutil`
+   and `security` commands it prints, then re-run.
+5. Open a new terminal so the declared zsh config and aliases load.
+6. Work through the checklist in
+   [README.md](../README.md#manual-steps-after-first-bootstrap): 1Password
+   and its SSH agent, the optional signing key, launching Firefox once, and
+   everything later sections of this runbook cannot do for you.
 
 ## Adopting a Mac that already has stuff on it
 
@@ -142,6 +148,32 @@ change that fails to evaluate or misbehaves.
    and commit the lock file; `dru` then becomes the only way inputs move.
 
 ## Troubleshooting
+
+**`bootstrap.sh` says the username does not match.** The macOS account
+(`id -un`) and `username` in `flake.nix` differ. Fix the flake, or rename the
+account (log in as another admin, System Settings > Users & Groups >
+right-click the user > Advanced Options; the home folder must be renamed
+too). Renaming is the riskier of the two.
+
+**`bootstrap.sh` refuses to run as root.** Run it as your user. Nix would
+otherwise refuse the checkout (libgit2 "repository path is not owned by
+current user") and Homebrew refuses root outright; the script uses sudo
+itself where needed.
+
+**Nix installer: "Volume on diskNsM failed to mount", "/nix Read-only file
+system".** The `/nix` firmlink did not exist yet. Reboot and re-run
+`bootstrap.sh`; it now detects this state before starting the installer and
+also spots a "Nix Store" volume left behind by the failed attempt, printing
+the cleanup commands. Determinate also ships a graphical `.pkg` installer
+(https://dtr.mn/determinate-nix); it drives the same installer engine, so it
+is not expected to avoid this, and switching would trade the scriptable
+`curl | sh` step for a download plus `installer -pkg`.
+
+**A cask asks for a password in the middle of `drs`.** Its installer needs
+root and the sudo credential from the start of the run has expired (macOS
+caches it for five minutes per terminal). Run `sudo -v` right before `drs`,
+or answer the prompt; if the terminal is left printing staircase output
+afterwards, `stty sane`.
 
 **The rebuild stops and waits for input.** It should not: `drs` and
 `bootstrap.sh` detach stdin so Homebrew's y/n prompts take their default.
