@@ -42,6 +42,25 @@ if [[ "$HOSTNAME_FROM_FLAKE" != "$current_host" ]]; then
   echo "warning: flake.nix has hostname = \"$HOSTNAME_FROM_FLAKE\" but this Mac is \"$current_host\"; the build renames it" >&2
 fi
 
+# Ask for sudo once and keep the credential fresh for the whole run. Casks
+# whose installer needs root call sudo themselves; on a long first brew
+# bundle the credential from the start had expired, so they prompted a bare
+# "Password:" halfway through and left the tty with echo off and onlcr off
+# (staircase output). Neither nix-darwin's homebrew module nor nix-homebrew
+# has a non-interactive or sudo pass-through option: brew bundle runs as this
+# user through sudo --user, so a cask's sudo simply finds this user's cached
+# credential on this tty as long as it is still fresh.
+echo "==> sudo is needed for the Nix installer, Rosetta and the first rebuild"
+sudo -v
+( while true; do sleep 60; sudo -n true 2>/dev/null || exit; done ) &
+SUDO_KEEPALIVE=$!
+cleanup() {
+  kill "$SUDO_KEEPALIVE" 2>/dev/null || true
+  # a password prompt that was interrupted can leave the terminal unusable
+  if [[ -t 0 ]]; then stty sane 2>/dev/null || true; fi
+}
+trap cleanup EXIT
+
 # 1. Xcode Command Line Tools (git, compilers)
 if ! xcode-select -p >/dev/null 2>&1; then
   echo "==> Installing Xcode Command Line Tools (accept the dialog)…"
