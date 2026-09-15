@@ -12,6 +12,10 @@ USERNAME_FROM_FLAKE="$(flake_var username)"
 die() { echo "error: $*" >&2; exit 1; }
 
 [[ "$(uname -s)" == "Darwin" ]] || die "this script is for macOS"
+# Never as root: Nix refuses a checkout owned by someone else (libgit2
+# "repository path is not owned by current user") and Homebrew must run as
+# the normal user. The script escalates with sudo itself where it has to.
+[[ $EUID -ne 0 ]] || die "run this as your normal user, not with sudo; it escalates on its own where needed"
 [[ -n "$HOSTNAME_FROM_FLAKE" && "$HOSTNAME_FROM_FLAKE" != "CHANGEME" ]] \
   || die "edit the vars block in flake.nix first"
 
