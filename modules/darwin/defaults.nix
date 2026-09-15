@@ -61,11 +61,17 @@ in
       ShowHardDrivesOnDesktop = false;
       ShowRemovableMediaOnDesktop = true;
       FXRemoveOldTrashItems = true; # empty trash after 30 days
-      AppleShowAllExtensions = true; # Finder > Settings > Advanced
       FXEnableExtensionChangeWarning = false; # no "are you sure" on rename
     };
 
     NSGlobalDomain = {
+      # Finder > Settings > Advanced > "Show all filename extensions". This
+      # is a global key: Finder, and the Open and Save panels of every app,
+      # read it from NSGlobalDomain. nix-darwin also offers it under
+      # finder.*, but that writes com.apple.finder, which the fresh machine
+      # ignored (extensions stayed hidden). Finder is restarted in
+      # postActivation below, so it picks the value up on the same rebuild.
+      AppleShowAllExtensions = true;
       AppleInterfaceStyle = "Dark";
       AppleInterfaceStyleSwitchesAutomatically = false;
       # Icon & widget style and folder colour are left at their defaults

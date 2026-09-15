@@ -79,8 +79,8 @@ Captured 2026-08-20 from `defaults read`. Groups declared:
 | Group | Notable values |
 |---|---|
 | `dock` | no autohide, tile size 59, recents on, bottom-right hot corner Quick Note, 14 pinned apps in order, Downloads as a fan stack |
-| `finder` | show hidden files and all extensions, list view, new windows open on Home, full POSIX path in the title, external and removable drives on the Desktop, trash emptied after 30 days, no rename warning |
-| `NSGlobalDomain` | dark mode fixed, no auto-capitalise / period / spell-correct, natural scrolling off, force click on, spring-loading on |
+| `finder` | show hidden files, list view, new windows open on Home, full POSIX path in the title, external and removable drives on the Desktop, trash emptied after 30 days, no rename warning |
+| `NSGlobalDomain` | all filename extensions shown (the global key Finder and the Open/Save panels read; the `finder.*` variant writes `com.apple.finder` and was ignored), dark mode fixed, no auto-capitalise / period / spell-correct, natural scrolling off, force click on, spring-loading on |
 | `trackpad` | tap-to-click off, right-click on, three-finger drag off |
 | `screencapture` | thumbnail on, PNG, no window shadow, saved to `~/Pictures/Screenshots` (folder created by `modules/home/default.nix`) |
 | `screensaver`, `loginwindow` | password immediately on lock, guest account off |

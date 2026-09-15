@@ -205,6 +205,13 @@ nix-homebrew's launcher. `homebrew.onActivation.autoUpdate` must stay
 the Dock before Homebrew installs the pinned casks. `defaults.nix` restarts
 it a second time when that happened; if a tile is still `?`, `killall Dock`.
 
+**Finder still hides file extensions.** The switch that matters is
+`NSGlobalDomain AppleShowAllExtensions`, declared under `NSGlobalDomain`
+in `defaults.nix` (nix-darwin's `finder.AppleShowAllExtensions` writes
+`com.apple.finder`, which had no effect). Check with
+`defaults read NSGlobalDomain AppleShowAllExtensions` (1); Finder is
+restarted on every `drs`, so a window opened afterwards shows them.
+
 **Finder windows disappear during `drs`.** Expected: Finder is restarted so
 it picks up the declared view settings.
 
