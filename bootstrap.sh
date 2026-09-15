@@ -139,7 +139,22 @@ if [[ "$SRC_DIR" != "$REPO_DIR" && ! -e "$REPO_DIR" ]]; then
   ln -s "$SRC_DIR" "$REPO_DIR"
 fi
 
-# 5. First build: darwin-rebuild isn't installed yet, so run it from the flake.
+# 5. Full Disk Access. Safari's settings (modules/home/safari.nix) live in a
+# TCC-protected container, so the terminal app running the build needs the
+# grant. Warn now, so it can be made while the build runs; without it that
+# one step is skipped, nothing fails. ~/Library/Safari is a protected path:
+# "Operation not permitted" means no access, a missing directory only means
+# Safari has never been launched.
+if err="$(/bin/ls "$HOME/Library/Safari" 2>&1 >/dev/null)"; then
+  :
+elif [[ "$err" == *"Operation not permitted"* ]]; then
+  echo "warning: this terminal has no Full Disk Access; Safari settings are skipped until it does" >&2
+  echo "         System Settings > Privacy & Security > Full Disk Access: add the terminal app," >&2
+  echo "         then run drs from a new terminal window" >&2
+  open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles" || true
+fi
+
+# 6. First build: darwin-rebuild isn't installed yet, so run it from the flake.
 # stdin is detached so nothing downstream can stop and prompt: Homebrew's
 # y/n confirmations (e.g. `brew untap` on a tap with stuck formulae) only
 # fire on a TTY and otherwise take their safe non-interactive default.

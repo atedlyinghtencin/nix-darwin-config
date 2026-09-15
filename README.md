@@ -107,11 +107,19 @@ on a fresh machine.
   and the next `drs` asks again.
 - **Proton Drive**: sign in, then run `drs` again so Firefox's bookmark
   snapshots start landing in it.
-- **Safari AutoFill**: turned off by `modules/home/safari.nix`, but only
-  once the terminal app running `drs` has Full Disk Access (Safari's
-  preferences live in its sandbox container). Grant it, open a new terminal
-  window, quit Safari, run `drs`, then check with
+- **Full Disk Access** (System Settings > Privacy & Security > Full Disk
+  Access; TCC, so no config can grant it):
+  - Terminal.app, or whatever runs `drs`: `modules/home/safari.nix` writes
+    Safari's preferences, which live in its sandbox container. Without the
+    grant that step warns and opens this pane.
+  - AppCleaner.app: it removes app support files under
+    `~/Library/Containers`, which are protected the same way.
+- **Safari AutoFill**: turned off by `modules/home/safari.nix` once
+  Terminal has Full Disk Access. Open a new terminal window after granting
+  it, quit Safari, run `drs`, then check with
   `defaults read com.apple.Safari AutoFillPasswords` (prints `0`).
+- **System Settings > General > AutoFill & Passwords**: enable 1Password,
+  disable Passwords (iCloud Keychain).
 
 ## Day to day
 

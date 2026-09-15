@@ -52,6 +52,9 @@ precondition, so a second run only rebuilds. In order:
   `security delete-generic-password` cleanup). The Nix profile is sourced
   first so a re-run does not mistake an installed Nix for a missing one
 - Rosetta 2 via `softwareupdate` when `oahd` is not running (Apple Silicon)
+- warns, and opens the Full Disk Access pane, when listing
+  `~/Library/Safari` fails with "Operation not permitted" (the Safari step
+  of the build needs the grant; nothing fails without it)
 - symlinks the checkout to `~/.config/nix-darwin` if it lives elsewhere
 - the first `darwin-rebuild switch` straight from the nix-darwin flake, as
   root with stdin detached
