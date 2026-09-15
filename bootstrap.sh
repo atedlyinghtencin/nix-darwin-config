@@ -5,13 +5,38 @@ set -euo pipefail
 
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$HOME/.config/nix-darwin"
-HOSTNAME_FROM_FLAKE="$(sed -n 's/^[[:space:]]*hostname = "\(.*\)";.*/\1/p' "$SRC_DIR/flake.nix")"
+flake_var() { sed -n "s/^[[:space:]]*$1 = \"\(.*\)\";.*/\1/p" "$SRC_DIR/flake.nix"; }
+HOSTNAME_FROM_FLAKE="$(flake_var hostname)"
+USERNAME_FROM_FLAKE="$(flake_var username)"
 
 die() { echo "error: $*" >&2; exit 1; }
 
 [[ "$(uname -s)" == "Darwin" ]] || die "this script is for macOS"
 [[ -n "$HOSTNAME_FROM_FLAKE" && "$HOSTNAME_FROM_FLAKE" != "CHANGEME" ]] \
   || die "edit the vars block in flake.nix first"
+
+# 0. Identity. The flake names the macOS account and the machine. A mismatch
+# only surfaces deep inside the first build ("primary user X does not exist",
+# then home-manager's 'USER is "Y", expected "X"'), so compare up front.
+current_user="$(id -un)"
+if [[ "$USERNAME_FROM_FLAKE" != "$current_user" ]]; then
+  cat >&2 <<EOF
+error: flake.nix has username = "$USERNAME_FROM_FLAKE" but you are logged in as "$current_user".
+Either edit the vars block in flake.nix:
+
+  username = "$current_user";
+
+or rename the macOS account to "$USERNAME_FROM_FLAKE" (log in as a different
+admin, System Settings > Users & Groups > right-click the user > Advanced
+Options: account name and home folder), then run ./bootstrap.sh again.
+EOF
+  exit 1
+fi
+# The hostname is only a warning: the build sets networking.hostName itself.
+current_host="$(scutil --get LocalHostName 2>/dev/null || true)"
+if [[ "$HOSTNAME_FROM_FLAKE" != "$current_host" ]]; then
+  echo "warning: flake.nix has hostname = \"$HOSTNAME_FROM_FLAKE\" but this Mac is \"$current_host\"; the build renames it" >&2
+fi
 
 # 1. Xcode Command Line Tools (git, compilers)
 if ! xcode-select -p >/dev/null 2>&1; then
