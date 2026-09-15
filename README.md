@@ -29,6 +29,7 @@ modules/home/
   wallpaper/Index.plist    the captured wallpaper choice (Black, gradient)
   firefox-backups.nix      Firefox's daily bookmark snapshots land in Proton Drive
   default-browser.nix      Firefox as the default browser, via defaultbrowser (nixpkgs)
+  safari.nix               Safari AutoFill off (1Password does it); needs Full Disk Access
 scripts/
   collect-mac-facts.sh     read-only capture of the Mac's state into mac-facts/
   firefox_facts.py         read-only capture of Firefox add-ons + prefs as a firefox.nix draft
@@ -100,6 +101,11 @@ on a fresh machine.
   and the next `drs` asks again.
 - **Proton Drive**: sign in, then run `drs` again so Firefox's bookmark
   snapshots start landing in it.
+- **Safari AutoFill**: turned off by `modules/home/safari.nix`, but only
+  once the terminal app running `drs` has Full Disk Access (Safari's
+  preferences live in its sandbox container). Grant it, open a new terminal
+  window, quit Safari, run `drs`, then check with
+  `defaults read com.apple.Safari AutoFillPasswords` (prints `0`).
 
 ## Day to day
 

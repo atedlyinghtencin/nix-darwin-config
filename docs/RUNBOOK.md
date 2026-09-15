@@ -99,6 +99,7 @@ file are in [SCRIPTS.md](SCRIPTS.md).
 | change the prompt | `modules/home/starship.nix` |
 | change a git default | `modules/home/git.nix` |
 | add a generic ssh option | `modules/home/ssh.nix`; host blocks go in `~/.ssh/config.local` |
+| change a Safari preference | `modules/home/safari.nix` (needs Full Disk Access for the terminal) |
 | change the default browser | `modules/home/default-browser.nix` (Firefox hardcoded; macOS confirms with a dialog) |
 | change where Firefox bookmark backups go | `modules/home/firefox-backups.nix` (restore steps below) |
 | change the wallpaper | pick it in System Settings, run `collect-mac-facts.sh`, copy `mac-facts/wallpaper-index.plist` over `modules/home/wallpaper/Index.plist` |
@@ -169,6 +170,12 @@ the cleanup commands. Determinate also ships a graphical `.pkg` installer
 (https://dtr.mn/determinate-nix); it drives the same installer engine, so it
 is not expected to avoid this, and switching would trade the scriptable
 `curl | sh` step for a download plus `installer -pkg`.
+
+**`safari: this terminal has no Full Disk Access`.** Safari's preferences
+live in its sandbox container, which TCC protects. System Settings >
+Privacy & Security > Full Disk Access: add the terminal app (Terminal.app,
+or whatever runs `drs`), open a new terminal window and run `drs` again.
+The step also opens that pane for you.
 
 **A cask asks for a password in the middle of `drs`.** Its installer needs
 root and the sudo credential from the start of the run has expired (macOS

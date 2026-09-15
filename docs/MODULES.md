@@ -281,6 +281,19 @@ not list Firefox as an HTTP handler yet (before its first launch). macOS
 confirms the change with a one-time dialog; an ignored dialog means the step
 runs again on the next rebuild. Never fails the build.
 
+## modules/home/safari.nix
+
+Writes `AutoFillPasswords`, `AutoFillFromAddressBook` and
+`AutoFillCreditCardData` as `false` into `com.apple.Safari` with `defaults
+write`, which follows the sandboxed domain into
+`~/Library/Containers/com.apple.Safari`. That container is TCC-protected, so
+the step first lists `~/Library/Safari`: success means Full Disk Access and
+the keys that differ are written; "Operation not permitted" means no grant,
+so it warns, opens the Full Disk Access pane and continues; a missing
+directory means Safari has never been launched and it skips. Not done
+through `system.defaults.CustomUserPreferences` because nix-darwin's
+activation is `set -e` and a failed write there would abort the rebuild.
+
 ## .github/workflows/ci.yml
 
 `nix build .#darwinConfigurations.<host>.system` on `macos-latest` with the
