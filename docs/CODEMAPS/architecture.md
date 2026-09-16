@@ -31,7 +31,7 @@ home-manager.darwinModules → modules/home/default.nix (32)
 ├─ firefox-backups.nix (61)  activation: <profile>/bookmarkbackups → ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups
 ├─ default-browser.nix (33)  activation: defaultbrowser firefox unless already '* firefox'
 ├─ safari.nix (38)           activation: defaults write com.apple.Safari AutoFill* false, iff ~/Library/Safari readable (FDA)
-└─ terminal.nix (37)         activation: open terminal/nix-darwin.terminal once; Default/Startup Window Settings = nix-darwin
+└─ terminal.nix (37)         activation: defaults write 'Window Settings' -dict-add nix-darwin <profile dict> once; Default/Startup Window Settings = nix-darwin
 
 ## Activation order (one root shell, stdin detached; postActivation fragments in module-merge order)
 preActivation   homebrew.nix: brew update (only if bin/brew ∈ /nix/store; failure = warn)

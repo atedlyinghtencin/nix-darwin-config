@@ -220,6 +220,14 @@ with OrbStack up, VS Code is not finding the CLI in `~/.orbstack/bin`; the
 setting `dev.containers.dockerPath` in `modules/home/vscode.nix` is the
 place to point it there.
 
+**Terminal opens with a different profile, or shows a profile named
+`<hash>-nix-darwin`.** An earlier version of `terminal.nix` imported the
+profile by opening the file, which Terminal names after the file. Delete
+the hashed profile in Terminal > Settings > Profiles (select it, minus
+button), run `drs`, quit Terminal with ⌘Q and reopen; the `nix-darwin`
+profile is now written straight into Terminal's settings and read at
+launch.
+
 **Finder still hides file extensions.** The switch that matters is
 `NSGlobalDomain AppleShowAllExtensions`, declared under `NSGlobalDomain`
 in `defaults.nix` (nix-darwin's `finder.AppleShowAllExtensions` writes

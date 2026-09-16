@@ -309,12 +309,15 @@ profile exported from the Mac (16 ANSI colours, translucent blurred
 background, text, bold and selection colours, spacing, 120 x 30, profile
 version 2.09), renamed `nix-darwin` so it never collides with Terminal's
 own Clear Dark, with only the font archive changed from SF Mono 12 pt to
-`JetBrainsMonoNF-Regular` 12 pt. The activation opens the file when
-`defaults read com.apple.Terminal "Window Settings"` lacks the profile
-(registers it, opens one window), then writes `Default Window Settings` and
-`Startup Window Settings` when they differ. Both keys are set here, not via
-`CustomUserPreferences`, so they follow the import. Open windows keep their
-profile.
+`JetBrainsMonoNF-Regular` 12 pt. When
+`defaults read com.apple.Terminal "Window Settings"` lacks the profile, the
+activation adds the file's top-level dict to that dictionary with
+`defaults write -dict-add nix-darwin`, then writes `Default Window Settings`
+and `Startup Window Settings` when they differ. Not `open`: Terminal names
+an imported file after its file name (the store path gave a hashed name),
+and opens a window each time. Terminal reads the dictionary at launch, so
+a quit and relaunch shows the profile. Both keys are set here, not via
+`CustomUserPreferences`, so they follow the profile.
 
 ## .github/workflows/ci.yml
 

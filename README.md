@@ -130,10 +130,10 @@ on a fresh machine.
   raises. Docker, and with it VS Code Dev Containers, only works while
   OrbStack is running: open it before using Dev Containers, or turn on
   start at login in OrbStack > Settings so it is always up.
-- **Terminal profile**: the first rebuild imports the `nix-darwin` profile
-  (Clear Dark colours, JetBrainsMono Nerd Font 12 pt, 120 x 30) by opening
-  it, which opens one extra Terminal window; close it. Windows that were
-  already open keep the old profile until reopened. To change it, export
+- **Terminal profile**: the first rebuild adds the `nix-darwin` profile
+  (Clear Dark colours, JetBrainsMono Nerd Font 12 pt, 120 x 30) and makes
+  it the default. Terminal only reads profiles at launch, so quit it (⌘Q)
+  and reopen; until then windows keep the old profile. To change it, export
   from Terminal > Settings > Profiles > gear > Export and replace
   `modules/home/terminal/nix-darwin.terminal`, keeping the name `nix-darwin`
   and the Nerd Font (see the comment in `modules/home/terminal.nix`).
