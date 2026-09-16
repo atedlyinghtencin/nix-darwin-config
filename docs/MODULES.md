@@ -32,13 +32,33 @@ home-manager with `useGlobalPkgs`, `useUserPackages` and
 
 ## bootstrap.sh
 
-Fresh-Mac installer, safe to re-run. Refuses to run anywhere but macOS and
-refuses a `CHANGEME` hostname. Installs Xcode Command Line Tools if missing,
-installs Nix with the Determinate installer if missing, symlinks the checkout
-to `~/.config/nix-darwin` if it lives elsewhere, then runs the first
-`darwin-rebuild switch` straight from the nix-darwin flake with stdin
-detached. Reads the hostname out of `flake.nix` with the same `sed` that CI
-uses.
+Fresh-Mac installer, safe to re-run: every step checks its own
+precondition, so a second run only rebuilds. In order:
+
+- refuses anything but macOS, running as root, and a `CHANGEME` hostname;
+  warns when the checkout has no `flake.lock`
+- reads `username` and `hostname` out of `flake.nix` with the same `sed`
+  CI uses; a username that differs from `id -un` is fatal (both values and
+  both fixes are printed), a hostname that differs from
+  `scutil --get LocalHostName` is a warning
+- `sudo -v`, then a background loop refreshes the credential every 60 s so
+  casks that need root never prompt mid-run (together with
+  `Defaults !use_pty` from `hosts/macbook/default.nix`); the EXIT trap
+  kills the loop and runs `stty sane`
+- Xcode Command Line Tools if missing
+- Nix via the Determinate installer if missing, after two preflight checks:
+  `/etc/synthetic.conf` declares `nix` but `/nix` does not exist (reboot
+  needed), or a "Nix Store" APFS volume exists with nothing mounted on
+  `/nix` (prints the `diskutil apfs deleteVolume` and
+  `security delete-generic-password` cleanup). The Nix profile is sourced
+  first so a re-run does not mistake an installed Nix for a missing one
+- Rosetta 2 via `softwareupdate` when `oahd` is not running (Apple Silicon)
+- warns, and opens the Full Disk Access pane, when listing
+  `~/Library/Safari` fails with "Operation not permitted" (the Safari step
+  of the build needs the grant; nothing fails without it)
+- symlinks the checkout to `~/.config/nix-darwin` if it lives elsewhere
+- the first `darwin-rebuild switch` straight from the nix-darwin flake, as
+  root with stdin detached
 
 ## hosts/macbook/default.nix
 
@@ -46,12 +66,16 @@ System-level settings for this one machine:
 
 - imports the four `modules/darwin` files
 - `networking.hostName` / `computerName` from `vars`
+- `time.timeZone = "America/New_York"` (`systemsetup -settimezone` on every
+  activation; the automatic time zone toggle is turned off in `defaults.nix`
+  so it cannot override this)
 - `system.primaryUser` and the user account (shell `zsh`, home `/Users/<user>`)
 - `nix.enable = false` (Determinate installer owns the daemon)
 - `nixpkgs.config.allowUnfree = true`
 - system packages: `git`, `curl`, `coreutils`
 - `programs.zsh.enable` so `/etc/zshrc` sources the Nix environment
-- Touch ID for `sudo`
+- Touch ID for `sudo`; `Defaults !use_pty` in sudoers so a rebuild runs on
+  the real terminal and casks that call `sudo` find the cached credential
 - application firewall on, stealth mode on
 - font: JetBrains Mono Nerd Font
 - `system.stateVersion = 6`
@@ -63,12 +87,13 @@ Captured 2026-08-20 from `defaults read`. Groups declared:
 | Group | Notable values |
 |---|---|
 | `dock` | no autohide, tile size 59, recents on, bottom-right hot corner Quick Note, 14 pinned apps in order, Downloads as a fan stack |
-| `finder` | show hidden files and all extensions, list view, new windows open on Home, full POSIX path in the title, external and removable drives on the Desktop, trash emptied after 30 days, no rename warning |
-| `NSGlobalDomain` | dark mode fixed, no auto-capitalise / period / spell-correct, natural scrolling off, force click on, spring-loading on |
+| `finder` | show hidden files, list view, new windows open on Home, full POSIX path in the title, external and removable drives on the Desktop, trash emptied after 30 days, no rename warning |
+| `NSGlobalDomain` | all filename extensions shown (the global key Finder and the Open/Save panels read; the `finder.*` variant writes `com.apple.finder` and was ignored), dark mode fixed, no auto-capitalise / period / spell-correct, natural scrolling off, force click on, spring-loading on |
 | `trackpad` | tap-to-click off, right-click on, three-finger drag off |
 | `screencapture` | thumbnail on, PNG, no window shadow, saved to `~/Pictures/Screenshots` (folder created by `modules/home/default.nix`) |
 | `screensaver`, `loginwindow` | password immediately on lock, guest account off |
 | `spaces` | displays do not have separate Spaces (menu bar and Dock stay on the main display) |
+| `CustomSystemPreferences` | "Set time zone automatically" off (`/Library/Preferences/com.apple.timezone.auto` `Active = false`), so `time.timeZone` sticks |
 | `CustomUserPreferences` | personalised ads off; Finder's Recents view forced to list (undocumented key, verified on macOS 26) |
 
 Activation hooks in the same file:
@@ -129,7 +154,7 @@ Written into the `org.mozilla.firefox` defaults domain, which the Homebrew
 cask reads as enterprise policy on next launch (check `about:policies`).
 
 - `EnterprisePoliciesEnabled`, `DisableTelemetry`
-- `ExtensionSettings`: Proton Pass, OneTab, uBlock Origin, all
+- `ExtensionSettings`: 1Password, Proton Pass, OneTab, uBlock Origin, all
   `normal_installed` (auto-installed, user can disable but not remove) with
   `default_area = "menupanel"` so a fresh profile keeps the buttons under the
   extensions menu
@@ -223,17 +248,6 @@ smart commit, no window restore, no welcome page or walkthroughs, no release
 notes, no extension recommendations, and `chat.disableAIFeatures` to hide
 the built-in Copilot. Extensions are installed by `homebrew.nix`, not here.
 
-## modules/home/wallpaper.nix and wallpaper/Index.plist
-
-Since Sonoma the wallpaper choice lives in the per-user wallpaper store, not
-in `defaults`. `Index.plist` is the captured store file for "Black" with the
-Gradient toggle on all displays and Spaces. The activation step compares only
-`AllSpacesAndDisplays.Linked.Content` (WallpaperAgent rewrites timestamps, so
-a byte comparison would restart it every time), and when it differs copies
-the file in, makes it writable for the agent, and restarts WallpaperAgent.
-A declared file without that key path fails the activation with a message to
-re-capture with all Spaces linked.
-
 ## modules/home/firefox-backups.nix
 
 Firefox writes a compressed JSON snapshot of all bookmarks into
@@ -255,6 +269,46 @@ restore is manual, see [RUNBOOK.md](RUNBOOK.md#restoring-firefox-bookmarks).
 - Idempotent: an existing correct symlink means no output and no changes.
 
 History, logins and open tabs stay in the profile and are not backed up.
+
+## modules/home/default-browser.nix
+
+Installs `defaultbrowser` from nixpkgs and, after `writeBoundary`, runs it
+when Firefox is installed but not marked `*` in its handler list. Skips with
+a message when `/Applications/Firefox.app` is missing or LaunchServices does
+not list Firefox as an HTTP handler yet (before its first launch). macOS
+confirms the change with a one-time dialog; an ignored dialog means the step
+runs again on the next rebuild. Never fails the build.
+
+## modules/home/safari.nix
+
+Writes `AutoFillPasswords`, `AutoFillFromAddressBook` and
+`AutoFillCreditCardData` as `false` into `com.apple.Safari` with `defaults
+write`, which follows the sandboxed domain into
+`~/Library/Containers/com.apple.Safari`. That container is TCC-protected, so
+the step first lists `~/Library/Safari`: success means Full Disk Access and
+the keys that differ are written; "Operation not permitted" means no grant,
+so it warns, opens the Full Disk Access pane and continues; a missing
+directory means Safari has never been launched and it skips. Not done
+through `system.defaults.CustomUserPreferences` because nix-darwin's
+activation is `set -e` and a failed write there would abort the rebuild.
+
+## modules/home/terminal.nix and terminal/nix-darwin.terminal
+
+Terminal.app stores a profile's font as an NSKeyedArchiver blob, so the
+profile is a `.terminal` plist. Captured 2026-09-16: the "Clear Dark"
+profile exported from the Mac (16 ANSI colours, translucent blurred
+background, text, bold and selection colours, spacing, 120 x 30, profile
+version 2.09), renamed `nix-darwin` so it never collides with Terminal's
+own Clear Dark, with only the font archive changed from SF Mono 12 pt to
+`JetBrainsMonoNF-Regular` 12 pt. When
+`defaults read com.apple.Terminal "Window Settings"` lacks the profile, the
+activation adds the file's top-level dict to that dictionary with
+`defaults write -dict-add nix-darwin`, then writes `Default Window Settings`
+and `Startup Window Settings` when they differ. Not `open`: Terminal names
+an imported file after its file name (the store path gave a hashed name),
+and opens a window each time. Terminal reads the dictionary at launch, so
+a quit and relaunch shows the profile. Both keys are set here, not via
+`CustomUserPreferences`, so they follow the profile.
 
 ## .github/workflows/ci.yml
 

@@ -6,9 +6,11 @@
     ./starship.nix
     ./git.nix
     ./ssh.nix
-    ./wallpaper.nix
     ./vscode.nix
     ./firefox-backups.nix
+    ./default-browser.nix
+    ./safari.nix
+    ./terminal.nix
   ];
 
   home.username = vars.username;

@@ -19,7 +19,7 @@ to keep into the modules by hand, then run `drs`.
 | `applications.txt`, `applications-user.txt` | `/Applications` and `~/Applications` | casks installed outside Homebrew |
 | `dock-apps.txt` | pinned Dock apps, in order | `dockApps` in `defaults.nix` |
 | `defaults.txt` | `defaults read` of dock, finder, NSGlobalDomain, trackpad, screencapture, desktopservices, menu bar clock, spaces, screensaver, loginwindow. Finder's two recent-folder arrays are redacted (personal history) | `defaults.nix` |
-| `wallpaper-index.plist` | the wallpaper store as XML | `modules/home/wallpaper/Index.plist` |
+| `wallpaper-index.plist` | the wallpaper store as XML (reference only; nothing declares it) | — |
 | `vscode/settings.json`, `vscode/keybindings.json`, `vscode/snippets/` | VS Code user files | `modules/home/vscode.nix` |
 | `home-dotfiles.txt`, `config-dir.txt`, `dotfile-contents.txt` | names and sizes of `~/.*` and `~/.config`, then the contents of `.zshrc`, `.zprofile`, `.zshenv`, `.gitconfig`, `.gitignore_global`, `.ssh/config` | `zsh.nix`, `git.nix`, `ssh.nix` |
 | `tools.txt` | where common tools resolve on `PATH`, plus `code --list-extensions` | `homebrew.vscode` |

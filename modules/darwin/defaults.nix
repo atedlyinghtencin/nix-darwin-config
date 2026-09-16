@@ -61,11 +61,17 @@ in
       ShowHardDrivesOnDesktop = false;
       ShowRemovableMediaOnDesktop = true;
       FXRemoveOldTrashItems = true; # empty trash after 30 days
-      AppleShowAllExtensions = true; # Finder > Settings > Advanced
       FXEnableExtensionChangeWarning = false; # no "are you sure" on rename
     };
 
     NSGlobalDomain = {
+      # Finder > Settings > Advanced > "Show all filename extensions". This
+      # is a global key: Finder, and the Open and Save panels of every app,
+      # read it from NSGlobalDomain. nix-darwin also offers it under
+      # finder.*, but that writes com.apple.finder, which the fresh machine
+      # ignored (extensions stayed hidden). Finder is restarted in
+      # postActivation below, so it picks the value up on the same rebuild.
+      AppleShowAllExtensions = true;
       AppleInterfaceStyle = "Dark";
       AppleInterfaceStyleSwitchesAutomatically = false;
       # Icon & widget style and folder colour are left at their defaults
@@ -104,8 +110,17 @@ in
 
     # "Displays have separate Spaces" OFF: the Dock and menu bar stay on the
     # main display instead of following the pointer to whichever monitor it
-    # touches the bottom of. Takes effect after the next login.
+    # touches the bottom of. nix-darwin's naming is inverted relative to
+    # System Settings: true means one Space spans all displays. Written on
+    # every rebuild, but macOS only reads it at login, so a logout is needed
+    # once (README, manual steps).
     spaces.spans-displays = true;
+
+    # System-wide, written as root. "Set time zone automatically using your
+    # current location" off: it put this machine on Pacific time while it
+    # sits in Eastern, and it would keep overriding time.timeZone (set in
+    # hosts/macbook/default.nix). Verify with `systemsetup -gettimezone`.
+    CustomSystemPreferences."/Library/Preferences/com.apple.timezone.auto".Active = false;
 
     CustomUserPreferences = {
       "com.apple.AdLib".allowApplePersonalizedAdvertising = false;

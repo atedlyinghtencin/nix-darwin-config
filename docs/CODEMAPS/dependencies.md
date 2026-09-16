@@ -9,7 +9,7 @@ nix-homebrew   github:zhaofengli/nix-homebrew
 
 ## nixpkgs packages
 system   git curl coreutils nerd-fonts.jetbrains-mono zsh
-user     git wget uv ripgrep fd bat eza jq tree htop gh nixfmt nil
+user     git wget uv ripgrep fd bat eza jq tree htop gh nixfmt nil defaultbrowser
          + programs: fzf zoxide direnv(nix-direnv) starship delta gh home-manager
 
 ## Homebrew (modules/darwin/homebrew.nix)
@@ -22,7 +22,7 @@ vscode   mechatroner.rainbow-csv ms-python.{debugpy,python,vscode-pylance,vscode
 mas      (none)
 
 ## Firefox policy (modules/darwin/firefox.nix)
-add-ons  Proton Pass, OneTab, uBlock Origin  ← addons.mozilla.org latest.xpi, normal_installed, menupanel
+add-ons  1Password, Proton Pass, OneTab, uBlock Origin  ← addons.mozilla.org latest.xpi, normal_installed, menupanel
 prefs    43 via Preferences policy (2 locked: browser.ipProtection.enabled, identity.fxaccounts.toolbar.enabled)
 filters  ublock-filters.txt → 3rdparty.Extensions.uBlock0.toOverwrite.filters
 
@@ -34,7 +34,7 @@ addons.mozilla.org            add-on install_url
 1Password.app                 ssh agent socket (~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock), op-ssh-sign
 OrbStack                      ~/.orbstack/ssh/config, shell init
 Proton Drive.app              ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups (symlink target)
-macOS private API             activateSettings -u, plutil, defaults, killall Dock/Finder/WallpaperAgent
+macOS private API             activateSettings -u, plutil, defaults, killall Dock/Finder
 
 ## Tooling for the scripts
 python3 stdlib only (argparse, configparser, json, re, subprocess, sys, pathlib; tests: unittest, tempfile)

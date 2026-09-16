@@ -27,8 +27,11 @@ sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
 
 1. Edit the `vars` block in `flake.nix` if this is a different Mac
    (`whoami`, `scutil --get LocalHostName`, `scutil --get ComputerName`).
+   `username` must equal the macOS account name; `bootstrap.sh` refuses to
+   build otherwise, and warns (only) when the hostname differs, since the
+   build renames the machine.
 2. Sign in to the Mac App Store if `masApps` lists anything.
-3. Clone and run the installer:
+3. Clone and run the installer as the normal user (it refuses `sudo`):
 
    ```sh
    git clone <this repo> ~/.config/nix-darwin
@@ -36,17 +39,20 @@ sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
    ./bootstrap.sh
    ```
 
-   It installs the Xcode Command Line Tools (accept the dialog), Nix via the
-   Determinate installer, then builds and activates. The first run downloads
-   and installs everything Homebrew, so it takes a while.
-4. Open a new terminal so the declared zsh config and aliases load.
-5. Open 1Password, sign in, and turn on Settings → Developer → "Use the SSH
-   agent". Add your private SSH hosts to `~/.ssh/config.local`.
-6. Optional: to sign commits, copy the key's public half from 1Password into
-   `sshSigningKey` in `flake.nix`, run `drs`, and add the same public key to
-   GitHub as a *signing* key.
-7. Launch Firefox once: the policy installs the three add-ons and applies
-   the prefs on first start.
+   It asks for your password once and keeps sudo alive for the run, installs
+   the Xcode Command Line Tools (accept the dialog), Nix via the Determinate
+   installer, Rosetta 2 if missing, then builds and activates. The first run
+   downloads and installs everything Homebrew, so it takes a while.
+4. If the script stops with "Reboot, then run ./bootstrap.sh again": the
+   installer declared the `/nix` firmlink in `/etc/synthetic.conf`, and on a
+   fresh macOS the firmlink only appears at the next boot. Reboot and re-run.
+   If it instead reports a leftover "Nix Store" volume, run the `diskutil`
+   and `security` commands it prints, then re-run.
+5. Open a new terminal so the declared zsh config and aliases load.
+6. Work through the checklist in
+   [README.md](../README.md#manual-steps-after-first-bootstrap): 1Password
+   and its SSH agent, the optional signing key, launching Firefox once, and
+   everything later sections of this runbook cannot do for you.
 
 ## Adopting a Mac that already has stuff on it
 
@@ -93,8 +99,10 @@ file are in [SCRIPTS.md](SCRIPTS.md).
 | change the prompt | `modules/home/starship.nix` |
 | change a git default | `modules/home/git.nix` |
 | add a generic ssh option | `modules/home/ssh.nix`; host blocks go in `~/.ssh/config.local` |
+| change the Terminal profile (colours, font, window size) | export it over `modules/home/terminal/nix-darwin.terminal`, keep the name `nix-darwin` and the Nerd Font (comment in `terminal.nix`) |
+| change a Safari preference | `modules/home/safari.nix` (needs Full Disk Access for the terminal) |
+| change the default browser | `modules/home/default-browser.nix` (Firefox hardcoded; macOS confirms with a dialog) |
 | change where Firefox bookmark backups go | `modules/home/firefox-backups.nix` (restore steps below) |
-| change the wallpaper | pick it in System Settings, run `collect-mac-facts.sh`, copy `mac-facts/wallpaper-index.plist` over `modules/home/wallpaper/Index.plist` |
 | keep a secret or work-only setting | `~/.zshrc.local`, `~/.gitconfig.local`, `~/.ssh/config.local` (never tracked) |
 
 ## Restoring Firefox bookmarks
@@ -143,6 +151,41 @@ change that fails to evaluate or misbehaves.
 
 ## Troubleshooting
 
+**`bootstrap.sh` says the username does not match.** The macOS account
+(`id -un`) and `username` in `flake.nix` differ. Fix the flake, or rename the
+account (log in as another admin, System Settings > Users & Groups >
+right-click the user > Advanced Options; the home folder must be renamed
+too). Renaming is the riskier of the two.
+
+**`bootstrap.sh` refuses to run as root.** Run it as your user. Nix would
+otherwise refuse the checkout (libgit2 "repository path is not owned by
+current user") and Homebrew refuses root outright; the script uses sudo
+itself where needed.
+
+**Nix installer: "Volume on diskNsM failed to mount", "/nix Read-only file
+system".** The `/nix` firmlink did not exist yet. Reboot and re-run
+`bootstrap.sh`; it now detects this state before starting the installer and
+also spots a "Nix Store" volume left behind by the failed attempt, printing
+the cleanup commands. Determinate also ships a graphical `.pkg` installer
+(https://dtr.mn/determinate-nix); it drives the same installer engine, so it
+is not expected to avoid this, and switching would trade the scriptable
+`curl | sh` step for a download plus `installer -pkg`.
+
+**`safari: this terminal has no Full Disk Access`.** Safari's preferences
+live in its sandbox container, which TCC protects. System Settings >
+Privacy & Security > Full Disk Access: add the terminal app (Terminal.app,
+or whatever runs `drs`), open a new terminal window and run `drs` again.
+The step also opens that pane for you.
+
+**A cask asks for a password in the middle of `drs`.** Its installer needs
+root and sudo found no cached credential. Two causes: the credential from
+the start of the run expired (five minutes per terminal; run `sudo -v`
+right before a long `drs`), or `Defaults !use_pty` is not in effect yet
+(`hosts/macbook/default.nix`; sudo 1.9.14+ otherwise runs the rebuild in a
+fresh pty where nothing is cached, which is what the very first rebuild on
+this branch hit). Answer the prompt; if the terminal is left printing
+staircase output afterwards, `stty sane`.
+
 **The rebuild stops and waits for input.** It should not: `drs` and
 `bootstrap.sh` detach stdin so Homebrew's y/n prompts take their default.
 If you ran `darwin-rebuild` by hand, add `< /dev/null`. `sudo` still asks
@@ -164,6 +207,35 @@ nix-homebrew's launcher. `homebrew.onActivation.autoUpdate` must stay
 **Question-mark tiles in the Dock after the first run.** nix-darwin restarts
 the Dock before Homebrew installs the pinned casks. `defaults.nix` restarts
 it a second time when that happened; if a tile is still `?`, `killall Dock`.
+
+**The Dock jumps to whichever display the pointer is on.** "Displays have
+separate Spaces" is still on for this session. `defaults.nix` sets
+`spaces.spans-displays = true` (nix-darwin's inverted name: true means one
+Space spans all displays), but macOS reads it at login. Log out and back
+in. `defaults read com.apple.spaces spans-displays` should print `1`.
+
+**VS Code Dev Containers: "docker version 17.12.0 or later required".**
+That is the extension's message when it cannot reach docker at all. Docker
+comes from OrbStack, which has to be running: open it (or turn on start at
+login in its settings) and reload the VS Code window. If it still fails
+with OrbStack up, VS Code is not finding the CLI in `~/.orbstack/bin`; the
+setting `dev.containers.dockerPath` in `modules/home/vscode.nix` is the
+place to point it there.
+
+**Terminal opens with a different profile, or shows a profile named
+`<hash>-nix-darwin`.** An earlier version of `terminal.nix` imported the
+profile by opening the file, which Terminal names after the file. Delete
+the hashed profile in Terminal > Settings > Profiles (select it, minus
+button), run `drs`, quit Terminal with ⌘Q and reopen; the `nix-darwin`
+profile is now written straight into Terminal's settings and read at
+launch.
+
+**Finder still hides file extensions.** The switch that matters is
+`NSGlobalDomain AppleShowAllExtensions`, declared under `NSGlobalDomain`
+in `defaults.nix` (nix-darwin's `finder.AppleShowAllExtensions` writes
+`com.apple.finder`, which had no effect). Check with
+`defaults read NSGlobalDomain AppleShowAllExtensions` (1); Finder is
+restarted on every `drs`, so a window opened afterwards shows them.
 
 **Finder windows disappear during `drs`.** Expected: Finder is restarted so
 it picks up the declared view settings.
@@ -190,11 +262,6 @@ store. Change `modules/home/vscode.nix` and rebuild.
 **Screenshots land on the Desktop.** macOS falls back silently when the
 declared folder is missing. `modules/home/default.nix` creates
 `~/Pictures/Screenshots`; if it was deleted, run `drs`.
-
-**`wallpaper: declared Index.plist has no AllSpacesAndDisplays.Linked.Content`.**
-The captured store file was taken while displays or Spaces had different
-wallpapers. In System Settings set the wallpaper with all Spaces linked,
-re-capture, and replace `modules/home/wallpaper/Index.plist`.
 
 **`firefox-backups: … skipping` during `drs`.** Firefox or Proton Drive has
 not been launched on this machine yet, or the profile `profiles.ini` names

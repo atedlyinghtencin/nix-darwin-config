@@ -33,7 +33,7 @@ apply to anyone sending a pull request.
    Add a case first when fixing a classification bug (a bookkeeping pref
    that leaked through, or a real setting the noise regex swallowed).
 5. Apply with `drs` and check the result on the machine. Anything that
-   touches Homebrew cleanup, Dock, Finder, Firefox policy or the wallpaper
+   touches Homebrew cleanup, Dock, Finder or Firefox policy
    is worth trying in a tart VM first.
 6. Update the docs that describe what you changed (table below).
 7. Commit.

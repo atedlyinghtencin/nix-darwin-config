@@ -3,7 +3,7 @@
   # Firefox reads the org.mozilla.firefox defaults domain as enterprise policy,
   # so the Homebrew cask stays as is and this block is applied on next launch.
   # Regenerate the raw list with ./scripts/firefox_facts.py (macOS Terminal);
-  # captured 2026-09-12 and pruned by hand:
+  # captured 2026-09-12 and pruned by hand (1Password added 2026-09-15):
   #   - uMatrix left out: unmaintained since 2021, uBlock Origin covers it
   #   - the two datareporting.*.uploadEnabled prefs became DisableTelemetry
   #   - findbar.highlightAll, print_printer, privacy.clearHistory.*,
@@ -26,6 +26,11 @@
     # placement for a button that has never been placed, so it applies to a
     # fresh profile; a profile that already pinned the button keeps that.
     ExtensionSettings = {
+      "{d634138d-c276-4fc8-924b-40a0ea21d284}" = {  # 1Password (added 2026-09-15, not from the capture)
+        installation_mode = "normal_installed";
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi";
+        default_area = "menupanel";
+      };
       "78272b6fa58f4a1abaac99321d503a20@proton.me" = {  # Proton Pass: Free Password Manager 1.38.0
         installation_mode = "normal_installed";
         install_url = "https://addons.mozilla.org/firefox/downloads/latest/78272b6fa58f4a1abaac99321d503a20@proton.me/latest.xpi";

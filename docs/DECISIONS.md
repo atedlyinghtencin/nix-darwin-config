@@ -57,6 +57,11 @@ and wait.
 - **stdin detached**: `drs` and `bootstrap.sh` run the rebuild
   with `< /dev/null`, so Homebrew's y/n prompts, which only fire on a TTY,
   take their safe default. `sudo` still reads the password from `/dev/tty`.
+- **`Defaults !use_pty`** (2026-09-16): sudo 1.9.14+ runs commands in a
+  fresh pty, and its credential cache is per terminal, so casks calling
+  `sudo` inside a rebuild prompted even right after `drs` authenticated.
+  Rebuilds run on the real terminal again; `bootstrap.sh` keeps the
+  credential fresh for the long first run.
 - **`brew-gc.nix`**: `brew bundle --force-cleanup` uninstalls in
   one batch, and a single protected dependency aborts the batch, so on a
   pre-existing Homebrew nothing was actually removed and the following
@@ -123,6 +128,15 @@ neither a `defaults` key nor an image. The captured `Index.plist` is installed
 verbatim when its `Linked.Content` differs from the store's, then
 WallpaperAgent is restarted. Comparing the key path rather than the file
 avoids restarting the agent on every rebuild.
+
+## 2026-09-16 Wallpaper no longer managed (supersedes 2026-09-13)
+
+The store-file approach was the only way to declare a built-in colour, but
+it meant a rebuild could overwrite a wallpaper picked in System Settings.
+Removed: `wallpaper.nix` and the captured `Index.plist`. The capture step in
+`collect-mac-facts.sh` stays, so the current choice can still be inspected.
+**Consequence.** The wallpaper is set by hand and is not restored on a fresh
+install.
 
 ## 2026-09-13 Heal "?" Dock tiles with a second restart
 

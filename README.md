@@ -1,8 +1,8 @@
 # redxiii (nix-darwin)
 
 Whole-machine declarative setup for an Apple Silicon MacBook: packages, GUI apps
-(Homebrew), Mac App Store apps, macOS system defaults, Firefox policy, VS Code,
-wallpaper and dotfiles (home-manager), all from one flake.
+(Homebrew), Mac App Store apps, macOS system defaults, Firefox policy, VS Code
+and dotfiles (home-manager), all from one flake.
 
 ## Layout
 
@@ -25,9 +25,11 @@ modules/home/
   git.nix                  git + delta + gh, optional SSH commit signing
   ssh.nix                  ssh via the 1Password agent
   vscode.nix               VS Code settings.json (extensions live in homebrew.nix)
-  wallpaper.nix            wallpaper store file, installed when the choice differs
-  wallpaper/Index.plist    the captured wallpaper choice (Black, gradient)
   firefox-backups.nix      Firefox's daily bookmark snapshots land in Proton Drive
+  default-browser.nix      Firefox as the default browser, via defaultbrowser (nixpkgs)
+  safari.nix               Safari AutoFill off (1Password does it); needs Full Disk Access
+  terminal.nix             Terminal.app profile with the Nerd Font, imported once and made the default
+  terminal/nix-darwin.terminal  the exported Clear Dark profile, renamed, with the Nerd Font
 scripts/
   collect-mac-facts.sh     read-only capture of the Mac's state into mac-facts/
   firefox_facts.py         read-only capture of Firefox add-ons + prefs as a firefox.nix draft
@@ -47,11 +49,19 @@ docs/                      architecture, module reference, runbook, scripts, dec
 | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | you are making a change and want the checklist |
 | [docs/CODEMAPS/](docs/CODEMAPS/) | token-lean maps of the module graph and dependencies, for AI context |
 
-## Fresh machine
+## Fresh install
 
-1. `vars` in `flake.nix` is already filled in for this machine; edit it for a different one.
-2. Sign in to the Mac App Store if you use `masApps`.
-3. Run:
+Before you start:
+
+- The macOS account name must equal `username` in `flake.nix` (`whoami`).
+  `bootstrap.sh` stops with both values if they differ; either edit the
+  `vars` block or rename the account.
+- Run `bootstrap.sh` as that user, never with `sudo`. It asks for your
+  password once, keeps the credential fresh for the whole run, and escalates
+  on its own where it has to.
+- Sign in to the Mac App Store first if `masApps` lists anything.
+
+1. Clone and run:
 
    ```sh
    git clone <this repo> ~/.config/nix-darwin
@@ -59,12 +69,72 @@ docs/                      architecture, module reference, runbook, scripts, dec
    ./bootstrap.sh
    ```
 
-4. Open a new terminal.
-5. Sign in to 1Password and turn on Settings → Developer → "Use the SSH agent".
-   Drop private host blocks in `~/.ssh/config.local` (see below).
+2. If it stops with "Reboot, then run ./bootstrap.sh again", do exactly
+   that. The Nix installer declared the `/nix` firmlink, and on a fresh
+   macOS the firmlink only appears at the next boot. The second run installs
+   Nix, then Rosetta 2 if it is missing, and builds.
+3. When it prints "Done", open a new terminal so the declared shell, the
+   `drs` alias and the Nerd Font profile load.
+4. Work through [Manual steps after first bootstrap](#manual-steps-after-first-bootstrap).
 
-Step by step, including adopting a Mac that already has software on it, in
-[docs/RUNBOOK.md](docs/RUNBOOK.md#fresh-machine).
+From then on every change is `drs`. A rebuild that installs a cask whose
+installer needs root asks for your password in the middle of the run; run
+`sudo -v` right before `drs` so the credential is fresh, or type it when
+asked. Details, adopting a Mac that already has software on it, and
+troubleshooting in [docs/RUNBOOK.md](docs/RUNBOOK.md#fresh-machine).
+
+## Manual steps after first bootstrap
+
+What macOS and the apps do not let this repo set. Each is a one-time step
+on a fresh machine.
+
+- **1Password**: sign in, then Settings > Developer > "Use the SSH agent".
+  Private host blocks go in `~/.ssh/config.local` (see below). To sign
+  commits, put the key's public half in `sshSigningKey` in `flake.nix`, run
+  `drs`, and add the same key to GitHub as a signing key.
+- **Firefox**: launch it once. The policy installs the add-ons (1Password,
+  Proton Pass, OneTab, uBlock Origin) and applies the prefs on first start.
+  After any rebuild that changes `firefox.nix`, quit Firefox fully (⌘Q)
+  and relaunch; policies are read at startup. 1Password and Proton Pass
+  each need a one-time sign-in in the extension.
+- **Proton Pass extension, first launch**: Settings > disable Autofill,
+  Autosave, Autosuggest, and Passkeys. These are stored in the extension
+  and cannot be set by this config.
+- **Default browser**: the first rebuild after Firefox is installed runs
+  `defaultbrowser firefox`, and macOS asks "Do you want to change your
+  default web browser?" once. Accept it. That dialog cannot be suppressed
+  without MDM; if LaunchServices did not know Firefox yet, the step says so
+  and the next `drs` asks again.
+- **Proton Drive**: sign in, then run `drs` again so Firefox's bookmark
+  snapshots start landing in it.
+- **Full Disk Access** (System Settings > Privacy & Security > Full Disk
+  Access; TCC, so no config can grant it):
+  - Terminal.app, or whatever runs `drs`: `modules/home/safari.nix` writes
+    Safari's preferences, which live in its sandbox container. Without the
+    grant that step warns and opens this pane.
+  - AppCleaner.app: it removes app support files under
+    `~/Library/Containers`, which are protected the same way.
+- **Safari AutoFill**: turned off by `modules/home/safari.nix` once
+  Terminal has Full Disk Access. Open a new terminal window after granting
+  it, quit Safari, run `drs`, then check with
+  `defaults read com.apple.Safari AutoFillPasswords` (prints `0`).
+- **System Settings > General > AutoFill & Passwords**: enable 1Password,
+  disable Passwords (iCloud Keychain).
+- **Log out and back in once**: "Displays have separate Spaces" is turned
+  off by `defaults.nix` (`spaces.spans-displays = true`, nix-darwin's
+  inverted name), which stops the Dock from jumping to whichever display
+  the pointer is on. macOS only reads it at login.
+- **OrbStack**: launch it once and accept the macOS permission dialogs it
+  raises. Docker, and with it VS Code Dev Containers, only works while
+  OrbStack is running: open it before using Dev Containers, or turn on
+  start at login in OrbStack > Settings so it is always up.
+- **Terminal profile**: the first rebuild adds the `nix-darwin` profile
+  (Clear Dark colours, JetBrainsMono Nerd Font 12 pt, 120 x 30) and makes
+  it the default. Terminal only reads profiles at launch, so quit it (⌘Q)
+  and reopen; until then windows keep the old profile. To change it, export
+  from Terminal > Settings > Profiles > gear > Export and replace
+  `modules/home/terminal/nix-darwin.terminal`, keeping the name `nix-darwin`
+  and the Nerd Font (see the comment in `modules/home/terminal.nix`).
 
 ## Day to day
 
@@ -97,7 +167,6 @@ a known-good state instead, remove `flake.lock` from `.gitignore` and commit it.
   merge `mac-facts/firefox.nix` in by hand.
 - **uBlock Origin custom filter** → `modules/darwin/ublock-filters.txt` (one filter
   per line; overwrites the "My filters" pane on every Firefox launch)
-- **Wallpaper** → pick it in System Settings, re-capture, replace `modules/home/wallpaper/Index.plist`
 - **Firefox bookmarks** → backed up to Proton Drive daily by `modules/home/firefox-backups.nix`;
   restore is a few clicks in Firefox, see [docs/RUNBOOK.md](docs/RUNBOOK.md#restoring-firefox-bookmarks)
 - **Secrets / work-only config** → `~/.zshrc.local`, `~/.gitconfig.local`,
