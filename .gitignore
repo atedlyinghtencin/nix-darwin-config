@@ -8,3 +8,5 @@ mac-facts/
 __pycache__/
 # generated codemap reports (docs/CODEMAPS/ is the tracked output)
 .reports/
+# scratch files handed to Claude for discussion (issue logs, exported profiles)
+zzzz-*
