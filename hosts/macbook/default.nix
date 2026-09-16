@@ -10,6 +10,11 @@
   networking.hostName = vars.hostname;
   networking.computerName = vars.computerName;
 
+  # Eastern US, fixed. "Set time zone automatically using your current
+  # location" is off in defaults.nix; left on, it guessed Pacific and would
+  # override this again. `sudo systemsetup -listtimezones` for other values.
+  time.timeZone = "America/New_York";
+
   # nix-darwin needs to know which user owns user-scoped settings
   # (Homebrew, system.defaults, etc.).
   system.primaryUser = vars.username;

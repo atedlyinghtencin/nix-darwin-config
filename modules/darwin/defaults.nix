@@ -116,6 +116,12 @@ in
     # once (README, manual steps).
     spaces.spans-displays = true;
 
+    # System-wide, written as root. "Set time zone automatically using your
+    # current location" off: it put this machine on Pacific time while it
+    # sits in Eastern, and it would keep overriding time.timeZone (set in
+    # hosts/macbook/default.nix). Verify with `systemsetup -gettimezone`.
+    CustomSystemPreferences."/Library/Preferences/com.apple.timezone.auto".Active = false;
+
     CustomUserPreferences = {
       "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
       # Recents (a saved search) keeps its own view style; nix-darwin has no

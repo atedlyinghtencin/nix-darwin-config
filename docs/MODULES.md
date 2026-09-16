@@ -65,6 +65,9 @@ System-level settings for this one machine:
 
 - imports the four `modules/darwin` files
 - `networking.hostName` / `computerName` from `vars`
+- `time.timeZone = "America/New_York"` (`systemsetup -settimezone` on every
+  activation; the automatic time zone toggle is turned off in `defaults.nix`
+  so it cannot override this)
 - `system.primaryUser` and the user account (shell `zsh`, home `/Users/<user>`)
 - `nix.enable = false` (Determinate installer owns the daemon)
 - `nixpkgs.config.allowUnfree = true`
@@ -88,6 +91,7 @@ Captured 2026-08-20 from `defaults read`. Groups declared:
 | `screencapture` | thumbnail on, PNG, no window shadow, saved to `~/Pictures/Screenshots` (folder created by `modules/home/default.nix`) |
 | `screensaver`, `loginwindow` | password immediately on lock, guest account off |
 | `spaces` | displays do not have separate Spaces (menu bar and Dock stay on the main display) |
+| `CustomSystemPreferences` | "Set time zone automatically" off (`/Library/Preferences/com.apple.timezone.auto` `Active = false`), so `time.timeZone` sticks |
 | `CustomUserPreferences` | personalised ads off; Finder's Recents view forced to list (undocumented key, verified on macOS 26) |
 
 Activation hooks in the same file:
