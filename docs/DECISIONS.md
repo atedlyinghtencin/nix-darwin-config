@@ -57,6 +57,11 @@ and wait.
 - **stdin detached**: `drs` and `bootstrap.sh` run the rebuild
   with `< /dev/null`, so Homebrew's y/n prompts, which only fire on a TTY,
   take their safe default. `sudo` still reads the password from `/dev/tty`.
+- **`Defaults !use_pty`** (2026-09-16): sudo 1.9.14+ runs commands in a
+  fresh pty, and its credential cache is per terminal, so casks calling
+  `sudo` inside a rebuild prompted even right after `drs` authenticated.
+  Rebuilds run on the real terminal again; `bootstrap.sh` keeps the
+  credential fresh for the long first run.
 - **`brew-gc.nix`**: `brew bundle --force-cleanup` uninstalls in
   one batch, and a single protected dependency aborts the batch, so on a
   pre-existing Homebrew nothing was actually removed and the following

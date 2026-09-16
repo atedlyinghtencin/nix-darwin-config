@@ -43,13 +43,14 @@ if [[ "$HOSTNAME_FROM_FLAKE" != "$current_host" ]]; then
 fi
 
 # Ask for sudo once and keep the credential fresh for the whole run. Casks
-# whose installer needs root call sudo themselves; on a long first brew
-# bundle the credential from the start had expired, so they prompted a bare
-# "Password:" halfway through and left the tty with echo off and onlcr off
-# (staircase output). Neither nix-darwin's homebrew module nor nix-homebrew
-# has a non-interactive or sudo pass-through option: brew bundle runs as this
-# user through sudo --user, so a cask's sudo simply finds this user's cached
-# credential on this tty as long as it is still fresh.
+# whose installer needs root call sudo themselves, and sudo caches the
+# credential per terminal for five minutes; the first bundle runs far
+# longer than that. Two conditions make this work: the keepalive below, and
+# `Defaults !use_pty` in hosts/macbook/default.nix (sudo 1.9.14+ otherwise
+# runs the rebuild in a fresh pty where nothing is cached, so casks
+# prompted "Password:" mid-run and left the tty with echo off). Neither
+# nix-darwin's homebrew module nor nix-homebrew has a non-interactive or
+# sudo pass-through option; brew bundle runs as this user via sudo --user.
 echo "==> sudo is needed for the Nix installer, Rosetta and the first rebuild"
 sudo -v
 ( while true; do sleep 60; sudo -n true 2>/dev/null || exit; done ) &

@@ -179,10 +179,13 @@ or whatever runs `drs`), open a new terminal window and run `drs` again.
 The step also opens that pane for you.
 
 **A cask asks for a password in the middle of `drs`.** Its installer needs
-root and the sudo credential from the start of the run has expired (macOS
-caches it for five minutes per terminal). Run `sudo -v` right before `drs`,
-or answer the prompt; if the terminal is left printing staircase output
-afterwards, `stty sane`.
+root and sudo found no cached credential. Two causes: the credential from
+the start of the run expired (five minutes per terminal; run `sudo -v`
+right before a long `drs`), or `Defaults !use_pty` is not in effect yet
+(`hosts/macbook/default.nix`; sudo 1.9.14+ otherwise runs the rebuild in a
+fresh pty where nothing is cached, which is what the very first rebuild on
+this branch hit). Answer the prompt; if the terminal is left printing
+staircase output afterwards, `stty sane`.
 
 **The rebuild stops and waits for input.** It should not: `drs` and
 `bootstrap.sh` detach stdin so Homebrew's y/n prompts take their default.

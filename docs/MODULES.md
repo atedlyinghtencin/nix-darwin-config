@@ -42,8 +42,9 @@ precondition, so a second run only rebuilds. In order:
   both fixes are printed), a hostname that differs from
   `scutil --get LocalHostName` is a warning
 - `sudo -v`, then a background loop refreshes the credential every 60 s so
-  casks that need root never prompt mid-run; the EXIT trap kills the loop
-  and runs `stty sane`
+  casks that need root never prompt mid-run (together with
+  `Defaults !use_pty` from `hosts/macbook/default.nix`); the EXIT trap
+  kills the loop and runs `stty sane`
 - Xcode Command Line Tools if missing
 - Nix via the Determinate installer if missing, after two preflight checks:
   `/etc/synthetic.conf` declares `nix` but `/nix` does not exist (reboot
@@ -73,7 +74,8 @@ System-level settings for this one machine:
 - `nixpkgs.config.allowUnfree = true`
 - system packages: `git`, `curl`, `coreutils`
 - `programs.zsh.enable` so `/etc/zshrc` sources the Nix environment
-- Touch ID for `sudo`
+- Touch ID for `sudo`; `Defaults !use_pty` in sudoers so a rebuild runs on
+  the real terminal and casks that call `sudo` find the cached credential
 - application firewall on, stealth mode on
 - font: JetBrains Mono Nerd Font
 - `system.stateVersion = 6`

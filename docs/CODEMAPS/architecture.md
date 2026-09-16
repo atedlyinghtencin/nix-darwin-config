@@ -13,7 +13,7 @@ zsh alias dru                 nix flake update && drs
 .github/workflows/ci.yml      nix build .#darwinConfigurations.<host>.system on macos-latest
 
 ## Module graph
-hosts/macbook/default.nix (55)         host, user, time zone, nix.enable=false, firewall, touchid sudo, fonts
+hosts/macbook/default.nix (55)         host, user, time zone, nix.enable=false, firewall, touchid sudo (+ !use_pty), fonts
 ├─ modules/darwin/defaults.nix (154)   system.defaults.* (incl. timezone.auto off); pre/postActivation Dock+Finder fixes
 ├─ modules/darwin/homebrew.nix (131)   homebrew.{taps,brews,casks,vscode,masApps}; preActivation brew update
 ├─ modules/darwin/brew-gc.nix (121)    postActivation: uninstall unmanaged formulae/casks/ext/taps
