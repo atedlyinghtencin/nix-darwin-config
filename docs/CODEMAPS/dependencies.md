@@ -34,7 +34,7 @@ addons.mozilla.org            add-on install_url
 1Password.app                 ssh agent socket (~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock), op-ssh-sign
 OrbStack                      ~/.orbstack/ssh/config, shell init
 Proton Drive.app              ~/Library/CloudStorage/ProtonDrive-*/Firefox/bookmarkbackups (symlink target)
-macOS private API             activateSettings -u, plutil, defaults, killall Dock/Finder/WallpaperAgent
+macOS private API             activateSettings -u, plutil, defaults, killall Dock/Finder
 
 ## Tooling for the scripts
 python3 stdlib only (argparse, configparser, json, re, subprocess, sys, pathlib; tests: unittest, tempfile)

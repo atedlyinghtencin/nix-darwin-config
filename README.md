@@ -1,8 +1,8 @@
 # redxiii (nix-darwin)
 
 Whole-machine declarative setup for an Apple Silicon MacBook: packages, GUI apps
-(Homebrew), Mac App Store apps, macOS system defaults, Firefox policy, VS Code,
-wallpaper and dotfiles (home-manager), all from one flake.
+(Homebrew), Mac App Store apps, macOS system defaults, Firefox policy, VS Code
+and dotfiles (home-manager), all from one flake.
 
 ## Layout
 
@@ -25,8 +25,6 @@ modules/home/
   git.nix                  git + delta + gh, optional SSH commit signing
   ssh.nix                  ssh via the 1Password agent
   vscode.nix               VS Code settings.json (extensions live in homebrew.nix)
-  wallpaper.nix            wallpaper store file, installed when the choice differs
-  wallpaper/Index.plist    the captured wallpaper choice (Black, gradient)
   firefox-backups.nix      Firefox's daily bookmark snapshots land in Proton Drive
   default-browser.nix      Firefox as the default browser, via defaultbrowser (nixpkgs)
   safari.nix               Safari AutoFill off (1Password does it); needs Full Disk Access
@@ -169,7 +167,6 @@ a known-good state instead, remove `flake.lock` from `.gitignore` and commit it.
   merge `mac-facts/firefox.nix` in by hand.
 - **uBlock Origin custom filter** → `modules/darwin/ublock-filters.txt` (one filter
   per line; overwrites the "My filters" pane on every Firefox launch)
-- **Wallpaper** → pick it in System Settings, re-capture, replace `modules/home/wallpaper/Index.plist`
 - **Firefox bookmarks** → backed up to Proton Drive daily by `modules/home/firefox-backups.nix`;
   restore is a few clicks in Firefox, see [docs/RUNBOOK.md](docs/RUNBOOK.md#restoring-firefox-bookmarks)
 - **Secrets / work-only config** → `~/.zshrc.local`, `~/.gitconfig.local`,

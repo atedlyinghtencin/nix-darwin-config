@@ -248,17 +248,6 @@ smart commit, no window restore, no welcome page or walkthroughs, no release
 notes, no extension recommendations, and `chat.disableAIFeatures` to hide
 the built-in Copilot. Extensions are installed by `homebrew.nix`, not here.
 
-## modules/home/wallpaper.nix and wallpaper/Index.plist
-
-Since Sonoma the wallpaper choice lives in the per-user wallpaper store, not
-in `defaults`. `Index.plist` is the captured store file for "Black" with the
-Gradient toggle on all displays and Spaces. The activation step compares only
-`AllSpacesAndDisplays.Linked.Content` (WallpaperAgent rewrites timestamps, so
-a byte comparison would restart it every time), and when it differs copies
-the file in, makes it writable for the agent, and restarts WallpaperAgent.
-A declared file without that key path fails the activation with a message to
-re-capture with all Spaces linked.
-
 ## modules/home/firefox-backups.nix
 
 Firefox writes a compressed JSON snapshot of all bookmarks into

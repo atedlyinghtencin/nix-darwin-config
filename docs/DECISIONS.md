@@ -129,6 +129,15 @@ verbatim when its `Linked.Content` differs from the store's, then
 WallpaperAgent is restarted. Comparing the key path rather than the file
 avoids restarting the agent on every rebuild.
 
+## 2026-09-16 Wallpaper no longer managed (supersedes 2026-09-13)
+
+The store-file approach was the only way to declare a built-in colour, but
+it meant a rebuild could overwrite a wallpaper picked in System Settings.
+Removed: `wallpaper.nix` and the captured `Index.plist`. The capture step in
+`collect-mac-facts.sh` stays, so the current choice can still be inspected.
+**Consequence.** The wallpaper is set by hand and is not restored on a fresh
+install.
+
 ## 2026-09-13 Heal "?" Dock tiles with a second restart
 
 nix-darwin writes and restarts the Dock before Homebrew installs the pinned

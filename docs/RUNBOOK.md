@@ -103,7 +103,6 @@ file are in [SCRIPTS.md](SCRIPTS.md).
 | change a Safari preference | `modules/home/safari.nix` (needs Full Disk Access for the terminal) |
 | change the default browser | `modules/home/default-browser.nix` (Firefox hardcoded; macOS confirms with a dialog) |
 | change where Firefox bookmark backups go | `modules/home/firefox-backups.nix` (restore steps below) |
-| change the wallpaper | pick it in System Settings, run `collect-mac-facts.sh`, copy `mac-facts/wallpaper-index.plist` over `modules/home/wallpaper/Index.plist` |
 | keep a secret or work-only setting | `~/.zshrc.local`, `~/.gitconfig.local`, `~/.ssh/config.local` (never tracked) |
 
 ## Restoring Firefox bookmarks
@@ -263,11 +262,6 @@ store. Change `modules/home/vscode.nix` and rebuild.
 **Screenshots land on the Desktop.** macOS falls back silently when the
 declared folder is missing. `modules/home/default.nix` creates
 `~/Pictures/Screenshots`; if it was deleted, run `drs`.
-
-**`wallpaper: declared Index.plist has no AllSpacesAndDisplays.Linked.Content`.**
-The captured store file was taken while displays or Spaces had different
-wallpapers. In System Settings set the wallpaper with all Spaces linked,
-re-capture, and replace `modules/home/wallpaper/Index.plist`.
 
 **`firefox-backups: … skipping` during `drs`.** Firefox or Proton Drive has
 not been launched on this machine yet, or the profile `profiles.ini` names

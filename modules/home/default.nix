@@ -6,7 +6,6 @@
     ./starship.nix
     ./git.nix
     ./ssh.nix
-    ./wallpaper.nix
     ./vscode.nix
     ./firefox-backups.nix
     ./default-browser.nix
