@@ -225,7 +225,8 @@ prompts.
 | identity | `vars.fullName` / `vars.email`, overridable from `~/.gitconfig.local` |
 | defaults | `main` branch, `pull.rebase`, `push.autoSetupRemote`, `fetch.prune`, `rebase.autoStash`, `rerere`, `zdiff3` conflicts, histogram diff, `autocrlf = input` |
 | global ignores | `.DS_Store`, `*.swp`, `.direnv/`, `result`, `.claude/settings.local.json` |
-| signing (only when `vars.sshSigningKey` is set) | `gpg.format = ssh`, signer `op-ssh-sign` from 1Password.app, sign commits and tags |
+| signing (only when `vars.sshSigningKey` is set) | `gpg.format = ssh`, signer `op-ssh-sign` from 1Password.app, sign commits and tags. To sign without tracking the key, put the same block in `~/.gitconfig.local` instead |
+| signature verification | `gpg.ssh.allowedSignersFile = ~/.ssh/allowed_signers` (untracked, `<email> <public key>` per line); needed only for `git log --show-signature` |
 
 Also enables delta (side-by-side, line numbers, navigate) and `gh`.
 

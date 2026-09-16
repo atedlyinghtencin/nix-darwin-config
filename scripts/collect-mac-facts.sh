@@ -76,7 +76,7 @@ done
 echo "==> dotfiles (names + sizes only, then contents of the common ones)"
 ls -la "$HOME" | grep -E '^\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\.' > "$OUT/home-dotfiles.txt"
 ls -la "$HOME/.config" > "$OUT/config-dir.txt" 2>/dev/null || true
-for f in .zshrc .zprofile .zshenv .gitconfig .gitignore_global .ssh/config; do
+for f in .zshrc .zprofile .zshenv .gitconfig .config/git/config .gitignore_global .ssh/config; do
   [ -f "$HOME/$f" ] && { echo "### ~/$f"; cat "$HOME/$f"; echo; }
 done > "$OUT/dotfile-contents.txt"
 

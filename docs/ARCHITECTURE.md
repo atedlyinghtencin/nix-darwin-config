@@ -129,7 +129,8 @@ and silently skipped otherwise:
 | File | Read by | For |
 |---|---|---|
 | `~/.zshrc.local` | `zsh.nix` | secrets, work-only aliases |
-| `~/.gitconfig.local` | `git.nix` | work identity overrides |
+| `~/.gitconfig.local` | `git.nix` | work identity overrides, signing when the key stays untracked |
+| `~/.ssh/allowed_signers` | `git.nix` | public keys `git log --show-signature` trusts |
 | `~/.ssh/config.local` | `ssh.nix` | private host blocks |
 | `~/.orbstack/ssh/config` | `ssh.nix` | OrbStack's `orb` host |
 | `~/.local/bin/env` | `zsh.nix` | uv-installed tools |
@@ -137,6 +138,11 @@ and silently skipped otherwise:
 
 Private keys are not files at all: SSH authentication goes through the
 1Password agent socket and commit signing through 1Password's `op-ssh-sign`.
+
+Note that home-manager writes the git config to `~/.config/git/config`, not
+`~/.gitconfig`. Git reads both, and a stray `~/.gitconfig` wins on every
+conflict and captures `git config --global` writes, so it should not exist;
+move anything found there into `~/.gitconfig.local`.
 
 One thing flows the other way. Firefox's daily bookmark snapshots are written
 into Proton Drive through a symlink, so they leave the machine without any

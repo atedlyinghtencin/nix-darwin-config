@@ -169,7 +169,8 @@ a known-good state instead, remove `flake.lock` from `.gitignore` and commit it.
   per line; overwrites the "My filters" pane on every Firefox launch)
 - **Firefox bookmarks** → backed up to Proton Drive daily by `modules/home/firefox-backups.nix`;
   restore is a few clicks in Firefox, see [docs/RUNBOOK.md](docs/RUNBOOK.md#restoring-firefox-bookmarks)
-- **Secrets / work-only config** → `~/.zshrc.local`, `~/.gitconfig.local`,
+- **Secrets / work-only config** → `~/.zshrc.local`, `~/.gitconfig.local`
+  (also commit signing, if the public key should stay out of the repo),
   `~/.ssh/config.local` (private hosts) — sourced if present, never tracked.
   Generic ssh options live in `modules/home/ssh.nix`; host names and users
   go in `config.local`. Private keys live in 1Password, not in `~/.ssh`
