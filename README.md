@@ -126,6 +126,10 @@ on a fresh machine.
   off by `defaults.nix` (`spaces.spans-displays = true`, nix-darwin's
   inverted name), which stops the Dock from jumping to whichever display
   the pointer is on. macOS only reads it at login.
+- **OrbStack**: launch it once and accept the macOS permission dialogs it
+  raises. Docker, and with it VS Code Dev Containers, only works while
+  OrbStack is running: open it before using Dev Containers, or turn on
+  start at login in OrbStack > Settings so it is always up.
 - **Terminal profile**: the first rebuild imports the `nix-darwin` profile
   (Clear Dark colours, JetBrainsMono Nerd Font 12 pt, 120 x 30) by opening
   it, which opens one extra Terminal window; close it. Windows that were

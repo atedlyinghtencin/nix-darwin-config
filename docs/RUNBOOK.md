@@ -212,6 +212,14 @@ separate Spaces" is still on for this session. `defaults.nix` sets
 Space spans all displays), but macOS reads it at login. Log out and back
 in. `defaults read com.apple.spaces spans-displays` should print `1`.
 
+**VS Code Dev Containers: "docker version 17.12.0 or later required".**
+That is the extension's message when it cannot reach docker at all. Docker
+comes from OrbStack, which has to be running: open it (or turn on start at
+login in its settings) and reload the VS Code window. If it still fails
+with OrbStack up, VS Code is not finding the CLI in `~/.orbstack/bin`; the
+setting `dev.containers.dockerPath` in `modules/home/vscode.nix` is the
+place to point it there.
+
 **Finder still hides file extensions.** The switch that matters is
 `NSGlobalDomain AppleShowAllExtensions`, declared under `NSGlobalDomain`
 in `defaults.nix` (nix-darwin's `finder.AppleShowAllExtensions` writes
