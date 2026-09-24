@@ -108,13 +108,17 @@ in
 
     loginwindow.GuestEnabled = false;
 
-    # "Displays have separate Spaces" OFF: the Dock and menu bar stay on the
-    # main display instead of following the pointer to whichever monitor it
-    # touches the bottom of. nix-darwin's naming is inverted relative to
-    # System Settings: true means one Space spans all displays. Written on
-    # every rebuild, but macOS only reads it at login, so a logout is needed
-    # once (README, manual steps).
-    spaces.spans-displays = true;
+    # "Displays have separate Spaces" ON (the macOS default): each display has
+    # its own Spaces and menu bar, and the Dock follows the pointer to
+    # whichever display it touches the bottom of. nix-darwin's naming is
+    # inverted relative to System Settings: false means separate Spaces.
+    # Written on every rebuild, but macOS only reads it at login, so a logout
+    # is needed once after changing it (README, manual steps).
+    spaces.spans-displays = false;
+
+    # "Drag windows to left or right edge of screen to tile" on. Set
+    # explicitly so it stays on even if it gets switched off in System Settings.
+    WindowManager.EnableTilingByEdgeDrag = true;
 
     # System-wide, written as root. "Set time zone automatically using your
     # current location" off: it put this machine on Pacific time while it

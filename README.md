@@ -121,9 +121,8 @@ on a fresh machine.
 - **System Settings > General > AutoFill & Passwords**: enable 1Password,
   disable Passwords (iCloud Keychain).
 - **Log out and back in once**: "Displays have separate Spaces" is turned
-  off by `defaults.nix` (`spaces.spans-displays = true`, nix-darwin's
-  inverted name), which stops the Dock from jumping to whichever display
-  the pointer is on. macOS only reads it at login.
+  on by `defaults.nix` (`spaces.spans-displays = false`, nix-darwin's
+  inverted name), and macOS only reads it at login.
 - **OrbStack**: launch it once and accept the macOS permission dialogs it
   raises. Docker, and with it VS Code Dev Containers, only works while
   OrbStack is running: open it before using Dev Containers, or turn on

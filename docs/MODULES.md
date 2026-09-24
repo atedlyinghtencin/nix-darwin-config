@@ -92,7 +92,8 @@ Captured 2026-08-20 from `defaults read`. Groups declared:
 | `trackpad` | tap-to-click off, right-click on, three-finger drag off |
 | `screencapture` | thumbnail on, PNG, no window shadow, saved to `~/Pictures/Screenshots` (folder created by `modules/home/default.nix`) |
 | `screensaver`, `loginwindow` | password immediately on lock, guest account off |
-| `spaces` | displays do not have separate Spaces (menu bar and Dock stay on the main display) |
+| `spaces` | displays have separate Spaces (the macOS default: each display has its own menu bar, and the Dock follows the pointer) |
+| `WindowManager` | dragging a window to the left or right screen edge tiles it |
 | `CustomSystemPreferences` | "Set time zone automatically" off (`/Library/Preferences/com.apple.timezone.auto` `Active = false`), so `time.timeZone` sticks |
 | `CustomUserPreferences` | personalised ads off; Finder's Recents view forced to list (undocumented key, verified on macOS 26) |
 

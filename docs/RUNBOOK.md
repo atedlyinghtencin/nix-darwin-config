@@ -208,11 +208,13 @@ nix-homebrew's launcher. `homebrew.onActivation.autoUpdate` must stay
 the Dock before Homebrew installs the pinned casks. `defaults.nix` restarts
 it a second time when that happened; if a tile is still `?`, `killall Dock`.
 
-**The Dock jumps to whichever display the pointer is on.** "Displays have
-separate Spaces" is still on for this session. `defaults.nix` sets
-`spaces.spans-displays = true` (nix-darwin's inverted name: true means one
-Space spans all displays), but macOS reads it at login. Log out and back
-in. `defaults read com.apple.spaces spans-displays` should print `1`.
+**Spaces still span all displays after a rebuild.** "Displays have
+separate Spaces" has not taken effect for this session. `defaults.nix` sets
+`spaces.spans-displays = false` (nix-darwin's inverted name: false means
+each display has its own Spaces), but macOS reads it at login. Log out and
+back in. `defaults read com.apple.spaces spans-displays` should print `0`.
+With it on, the Dock moving to whichever display the pointer touches the
+bottom of is normal macOS behaviour.
 
 **VS Code Dev Containers: "docker version 17.12.0 or later required".**
 That is the extension's message when it cannot reach docker at all. Docker
