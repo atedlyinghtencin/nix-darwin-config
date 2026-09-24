@@ -147,9 +147,11 @@ on a fresh machine.
 | `python3 -m unittest discover -s scripts` | test the Firefox capture script |
 
 Edit a `.nix` file, run `drs`, done. `flake.lock` is deliberately untracked
-(see `.gitignore`): `dru`, a fresh clone and every CI run resolve all inputs
-to their latest revisions, while a plain `drs` reuses the last lock. Rolling policy — upstream breakage lands whenever it lands; to pin
-a known-good state instead, remove `flake.lock` from `.gitignore` and commit it.
+(see `.gitignore`), and a flake in a git checkout cannot see untracked
+files, so every `drs`, fresh clone and CI run resolves all inputs to their
+latest revisions; `dru` does nothing more than `drs`. Rolling policy —
+upstream breakage lands whenever it lands; to pin a known-good state
+instead, remove `flake.lock` from `.gitignore` and commit it.
 
 ## Where things go
 

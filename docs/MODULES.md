@@ -35,8 +35,7 @@ home-manager with `useGlobalPkgs`, `useUserPackages` and
 Fresh-Mac installer, safe to re-run: every step checks its own
 precondition, so a second run only rebuilds. In order:
 
-- refuses anything but macOS, running as root, and a `CHANGEME` hostname;
-  warns when the checkout has no `flake.lock`
+- refuses anything but macOS, running as root, and a `CHANGEME` hostname
 - reads `username` and `hostname` out of `flake.nix` with the same `sed`
   CI uses; a username that differs from `id -un` is fatal (both values and
   both fixes are printed), a hostname that differs from

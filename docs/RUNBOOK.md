@@ -8,7 +8,7 @@ Terminal on the Mac itself unless it says otherwise.
 | Task | Command |
 |---|---|
 | Apply the repo to the machine | `drs` |
-| Update all flake inputs, then apply | `dru` |
+| Update all flake inputs, then apply | `dru` (same as `drs` while the lock file is untracked) |
 | See what changed in the inputs | `git -C ~/.config/nix-darwin diff` (the lock file is untracked, so compare `nix flake metadata` before and after instead) |
 | List generations | `darwin-rebuild --list-generations` |
 | Undo the last switch | `sudo darwin-rebuild switch --rollback` |
@@ -138,8 +138,8 @@ then restore.
 
 ## When inputs roll forward and break
 
-`flake.lock` is untracked, so a `dru` (or a fresh clone) can pull an upstream
-change that fails to evaluate or misbehaves.
+`flake.lock` is untracked, so any rebuild, `drs` included, can pull an
+upstream change that fails to evaluate or misbehaves.
 
 1. `sudo darwin-rebuild switch --rollback` gets the machine back.
 2. To keep working while upstream fixes it, pin the offending input in

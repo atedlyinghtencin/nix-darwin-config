@@ -35,13 +35,14 @@ installer.
 
 ## 2026-08-29 Rolling inputs: `flake.lock` stays untracked
 
-**Decision.** Fix forward rather than pin. Every `dru`, fresh clone and CI
-run resolves nixpkgs, nix-darwin, home-manager and nix-homebrew to their
-latest revisions; a plain `drs` reuses the lock file the previous build
-left in the checkout.
-**Consequence.** Upstream breakage lands whenever it lands; the runbook
-covers rollback and temporary pinning. To pin permanently, track the lock
-file.
+**Decision.** Fix forward rather than pin. Every rebuild resolves nixpkgs,
+nix-darwin, home-manager and nix-homebrew to their latest revisions: a
+flake in a git checkout only sees tracked files, so the lock file a build
+writes is never read back. `drs` and `dru` behave the same, and a fresh
+clone or CI run is no different.
+**Consequence.** Upstream breakage lands whenever it lands, even on a
+`drs` for an unrelated one-line change; the runbook covers rollback and
+temporary pinning. To pin permanently, track the lock file.
 
 ## 2026-08-29 Automation never prompts
 
