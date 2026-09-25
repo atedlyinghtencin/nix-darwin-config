@@ -151,7 +151,13 @@ in
   '';
 
   system.activationScripts.postActivation.text = ''
-    /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    # Run as the user, the same way nix-darwin writes the user defaults.
+    # postActivation runs as root, and a root activateSettings pushes root's
+    # preferences into the live session: root has no swipescrolldirection, so
+    # natural scrolling came back on while System Settings still showed it off.
+    launchctl asuser "$(id -u -- ${lib.escapeShellArg vars.username})" \
+      sudo --user=${lib.escapeShellArg vars.username} -- \
+      /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
 
     # nix-darwin restarts the Dock after writing defaults but never Finder,
     # which only reads com.apple.finder at launch. Without this, a running
