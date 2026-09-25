@@ -68,9 +68,9 @@ either.
 sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
 ```
 
-1. **Evaluate and build.** The flake is evaluated with whatever `flake.lock`
-   resolves to right now (the lock file is untracked, so `dru`, a fresh
-   clone or a CI run resolves inputs to their latest revisions), and the system closure is built or downloaded
+1. **Evaluate and build.** The flake is evaluated with every input
+   resolved to its latest revision (the lock file is untracked, and a flake
+   in a git checkout ignores untracked files), and the system closure is built or downloaded
    into the Nix store. Nothing on the machine changes yet.
 2. **Activate** (as root, stdin detached so nothing can prompt):
 

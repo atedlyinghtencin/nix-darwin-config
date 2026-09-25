@@ -1,6 +1,6 @@
 result
 result-*
-# rolling policy: dru, a fresh clone and CI resolve inputs to latest (see README)
+# rolling policy: every rebuild and CI run resolves inputs to latest (see README)
 flake.lock
 .direnv/
 .DS_Store

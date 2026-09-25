@@ -23,5 +23,10 @@
       # inline suggestions, "set up Copilot" prompts). This one switch hides
       # and disables all of it; the Copilot extensions are not installed.
       "chat.disableAIFeatures" = true;
+
+      # Started from the Dock, VS Code reads the login shell's environment,
+      # which now waits on a keychain approval for GH_TOKEN (zsh.nix). The
+      # default 10 s is short for typing a password.
+      "application.shellEnvironmentResolutionTimeout" = 30;
     };
 }

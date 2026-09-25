@@ -8,7 +8,7 @@ Terminal on the Mac itself unless it says otherwise.
 | Task | Command |
 |---|---|
 | Apply the repo to the machine | `drs` |
-| Update all flake inputs, then apply | `dru` |
+| Update all flake inputs, then apply | `dru` (same as `drs` while the lock file is untracked) |
 | See what changed in the inputs | `git -C ~/.config/nix-darwin diff` (the lock file is untracked, so compare `nix flake metadata` before and after instead) |
 | List generations | `darwin-rebuild --list-generations` |
 | Undo the last switch | `sudo darwin-rebuild switch --rollback` |
@@ -138,8 +138,8 @@ then restore.
 
 ## When inputs roll forward and break
 
-`flake.lock` is untracked, so a `dru` (or a fresh clone) can pull an upstream
-change that fails to evaluate or misbehaves.
+`flake.lock` is untracked, so any rebuild, `drs` included, can pull an
+upstream change that fails to evaluate or misbehaves.
 
 1. `sudo darwin-rebuild switch --rollback` gets the machine back.
 2. To keep working while upstream fixes it, pin the offending input in
@@ -208,11 +208,13 @@ nix-homebrew's launcher. `homebrew.onActivation.autoUpdate` must stay
 the Dock before Homebrew installs the pinned casks. `defaults.nix` restarts
 it a second time when that happened; if a tile is still `?`, `killall Dock`.
 
-**The Dock jumps to whichever display the pointer is on.** "Displays have
-separate Spaces" is still on for this session. `defaults.nix` sets
-`spaces.spans-displays = true` (nix-darwin's inverted name: true means one
-Space spans all displays), but macOS reads it at login. Log out and back
-in. `defaults read com.apple.spaces spans-displays` should print `1`.
+**Spaces still span all displays after a rebuild.** "Displays have
+separate Spaces" has not taken effect for this session. `defaults.nix` sets
+`spaces.spans-displays = false` (nix-darwin's inverted name: false means
+each display has its own Spaces), but macOS reads it at login. Log out and
+back in. `defaults read com.apple.spaces spans-displays` should print `0`.
+With it on, the Dock moving to whichever display the pointer touches the
+bottom of is normal macOS behaviour.
 
 **VS Code Dev Containers: "docker version 17.12.0 or later required".**
 That is the extension's message when it cannot reach docker at all. Docker

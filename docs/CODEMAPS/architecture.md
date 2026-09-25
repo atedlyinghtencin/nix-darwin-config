@@ -5,7 +5,7 @@ Single-host nix-darwin flake. No services, no runtime; the "program" is a
 system closure that activates a Mac.
 
 ## Entry points
-flake.nix                     inputs + `vars` (username/hostname/email/system/sshSigningKey)
+flake.nix                     inputs + `vars` (username/hostname/email/system/sshSigningKey/ghTokenRef/opServiceAccountItem)
   → darwinConfigurations.redxiii (nix-darwin.lib.darwinSystem, aarch64-darwin)
 bootstrap.sh                  fresh Mac: CLT → Determinate Nix → symlink ~/.config/nix-darwin → first switch
 zsh alias drs                 sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null

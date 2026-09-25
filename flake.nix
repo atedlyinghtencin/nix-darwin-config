@@ -34,6 +34,18 @@
         # "ssh-ed25519 AAAA... comment" (1Password: key → Public key → Copy).
         # Empty = don't sign commits.
         sshSigningKey = "";
+        # 1Password secret reference to the GitHub token zsh.nix hands VS Code
+        # when it starts, and through remoteEnv its devcontainers. A pointer,
+        # not the token. The item is named by its ID, so renaming it in
+        # 1Password doesn't break this
+        # (`op item get "<name>" --format json | jq -r .id`). The vault holds
+        # only what a service account may read; see opServiceAccountItem.
+        ghTokenRef = "op://LLM Credentials/b4mybl4gutsmiz5hfwpbgztnfe/token";
+        # Login keychain item (service name) holding the token of a 1Password
+        # service account with read-only access to that vault alone, so `op`
+        # never asks for the whole account. Created untrusted by every app
+        # (`-T ""`), so macOS asks on each read. Either empty = off.
+        opServiceAccountItem = "op-service-account-llm";
       };
     in
     {

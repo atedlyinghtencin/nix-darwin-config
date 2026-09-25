@@ -25,6 +25,8 @@ The `vars` block is the only place machine identity lives:
 | `fullName`, `email` | git identity | `git.nix` |
 | `system` | `aarch64-darwin` | platform and formatter |
 | `sshSigningKey` | `""` (off) | `git.nix`: non-empty turns on SSH commit and tag signing via 1Password |
+| `ghTokenRef` | `op://LLM Credentials/b4mybl4gutsmiz5hfwpbgztnfe/token` | `zsh.nix`: gives VS Code `GH_TOKEN` from 1Password at launch; a secret reference, not the token |
+| `opServiceAccountItem` | `op-service-account-llm` | `zsh.nix`: login keychain item holding a 1Password service-account token (read-only, that vault only); asks on every read. Either this or `ghTokenRef` empty turns it off |
 
 Other settings in the flake: nix-homebrew with Rosetta and `autoMigrate`;
 home-manager with `useGlobalPkgs`, `useUserPackages` and
@@ -35,8 +37,7 @@ home-manager with `useGlobalPkgs`, `useUserPackages` and
 Fresh-Mac installer, safe to re-run: every step checks its own
 precondition, so a second run only rebuilds. In order:
 
-- refuses anything but macOS, running as root, and a `CHANGEME` hostname;
-  warns when the checkout has no `flake.lock`
+- refuses anything but macOS, running as root, and a `CHANGEME` hostname
 - reads `username` and `hostname` out of `flake.nix` with the same `sed`
   CI uses; a username that differs from `id -un` is fatal (both values and
   both fixes are printed), a hostname that differs from
@@ -92,7 +93,8 @@ Captured 2026-08-20 from `defaults read`. Groups declared:
 | `trackpad` | tap-to-click off, right-click on, three-finger drag off |
 | `screencapture` | thumbnail on, PNG, no window shadow, saved to `~/Pictures/Screenshots` (folder created by `modules/home/default.nix`) |
 | `screensaver`, `loginwindow` | password immediately on lock, guest account off |
-| `spaces` | displays do not have separate Spaces (menu bar and Dock stay on the main display) |
+| `spaces` | displays have separate Spaces (the macOS default: each display has its own menu bar, and the Dock follows the pointer) |
+| `WindowManager` | dragging a window to the left or right screen edge tiles it |
 | `CustomSystemPreferences` | "Set time zone automatically" off (`/Library/Preferences/com.apple.timezone.auto` `Active = false`), so `time.timeZone` sticks |
 | `CustomUserPreferences` | personalised ads off; Finder's Recents view forced to list (undocumented key, verified on macOS 26) |
 
@@ -208,7 +210,12 @@ per-window session files from fighting the shared history.
 | `dru` | `nix flake update --flake ~/.config/nix-darwin && drs` |
 
 Functions: `mkcd <dir>` (mkdir and cd), `ports [port]` (listening TCP ports
-with their process). Sourced if present: Homebrew `shellenv`, OrbStack
+with their process). When VS Code (started from the Dock or Spotlight) reads
+the login shell's environment (`VSCODE_RESOLVING_ENVIRONMENT`), `GH_TOKEN` is
+read from `vars.ghTokenRef` with `op read` as a service account whose token
+comes from the keychain item `vars.opServiceAccountItem` (asked on every read);
+`.devcontainer/devcontainer.json` forwards it through `remoteEnv` so `gh`
+works in the container. Ordinary terminals never get it. Sourced if present: Homebrew `shellenv`, OrbStack
 `init.zsh`, `~/.local/bin/env`, `~/.zshrc.local`.
 
 ## modules/home/starship.nix
