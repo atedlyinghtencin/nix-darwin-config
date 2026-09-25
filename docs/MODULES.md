@@ -25,6 +25,8 @@ The `vars` block is the only place machine identity lives:
 | `fullName`, `email` | git identity | `git.nix` |
 | `system` | `aarch64-darwin` | platform and formatter |
 | `sshSigningKey` | `""` (off) | `git.nix`: non-empty turns on SSH commit and tag signing via 1Password |
+| `ghTokenRef` | `op://LLM Credentials/b4mybl4gutsmiz5hfwpbgztnfe/token` | `zsh.nix`: gives VS Code `GH_TOKEN` from 1Password at launch; a secret reference, not the token |
+| `opServiceAccountItem` | `op-service-account-llm` | `zsh.nix`: login keychain item holding a 1Password service-account token (read-only, that vault only); asks on every read. Either this or `ghTokenRef` empty turns it off |
 
 Other settings in the flake: nix-homebrew with Rosetta and `autoMigrate`;
 home-manager with `useGlobalPkgs`, `useUserPackages` and
@@ -208,7 +210,12 @@ per-window session files from fighting the shared history.
 | `dru` | `nix flake update --flake ~/.config/nix-darwin && drs` |
 
 Functions: `mkcd <dir>` (mkdir and cd), `ports [port]` (listening TCP ports
-with their process). Sourced if present: Homebrew `shellenv`, OrbStack
+with their process). When VS Code (started from the Dock or Spotlight) reads
+the login shell's environment (`VSCODE_RESOLVING_ENVIRONMENT`), `GH_TOKEN` is
+read from `vars.ghTokenRef` with `op read` as a service account whose token
+comes from the keychain item `vars.opServiceAccountItem` (asked on every read);
+`.devcontainer/devcontainer.json` forwards it through `remoteEnv` so `gh`
+works in the container. Ordinary terminals never get it. Sourced if present: Homebrew `shellenv`, OrbStack
 `init.zsh`, `~/.local/bin/env`, `~/.zshrc.local`.
 
 ## modules/home/starship.nix

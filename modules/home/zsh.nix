@@ -1,4 +1,4 @@
-{ vars, ... }:
+{ lib, vars, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -68,6 +68,24 @@
 
       # machine-local, untracked extras (secrets, work-only aliases)
       [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
+    '' + lib.optionalString (vars.ghTokenRef != "" && vars.opServiceAccountItem != "") ''
+
+      # GH_TOKEN for gh inside devcontainers (devcontainer.json forwards it
+      # via remoteEnv). Only while VS Code, started from the Dock or Spotlight,
+      # reads the login shell's environment, so ordinary terminals never hold
+      # it. The keychain asks on every read (the item trusts no app), then the
+      # service account reads the one vault it can see: no 1Password prompt
+      # for the whole account. A VS Code started from a terminal inherits that
+      # terminal's environment instead: no token.
+      if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then
+        () {
+          local sa token
+          sa="$(security find-generic-password -s ${lib.escapeShellArg vars.opServiceAccountItem} -w 2>/dev/null)" \
+            || return
+          token="$(OP_SERVICE_ACCOUNT_TOKEN="$sa" op read ${lib.escapeShellArg vars.ghTokenRef} 2>/dev/null)" \
+            && [[ -n "$token" ]] && export GH_TOKEN="$token"
+        }
+      fi
     '';
   };
 }
