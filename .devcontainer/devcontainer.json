@@ -22,6 +22,7 @@
         "eamodio.gitlens"
       ],
       "settings": {
+        "remote.autoForwardPorts": false,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.codeActionsOnSave": {
