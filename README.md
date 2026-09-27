@@ -72,7 +72,7 @@ Before you start:
 2. If it stops with "Reboot, then run ./bootstrap.sh again", do exactly
    that. The Nix installer declared the `/nix` firmlink, and on a fresh
    macOS the firmlink only appears at the next boot. The second run installs
-   Nix, then Rosetta 2 if it is missing, and builds.
+   Nix and builds.
 3. When it prints "Done", open a new terminal so the declared shell, the
    `drs` alias and the Nerd Font profile load.
 4. Work through [Manual steps after first bootstrap](#manual-steps-after-first-bootstrap).

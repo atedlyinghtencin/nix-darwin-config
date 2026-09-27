@@ -59,7 +59,6 @@
           {
             nix-homebrew = {
               enable = true;
-              enableRosetta = true; # Intel-only casks on Apple Silicon
               user = vars.username;
               autoMigrate = true; # adopt an existing /opt/homebrew install
             };

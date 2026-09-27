@@ -19,7 +19,7 @@ hosts/macbook/default.nix (55)         host, user, time zone, nix.enable=false, 
 ├─ modules/darwin/brew-gc.nix (121)    postActivation: uninstall unmanaged formulae/casks/ext/taps
 └─ modules/darwin/firefox.nix (101)    system.defaults.CustomUserPreferences."org.mozilla.firefox"
    └─ ublock-filters.txt (26)          → 3rdparty uBlock toOverwrite.filters
-nix-homebrew.darwinModules             installs brew from store, rosetta, autoMigrate
+nix-homebrew.darwinModules             installs brew from store, autoMigrate
 home-manager.darwinModules → modules/home/default.nix (32)
 ├─ packages.nix (40)   home.packages + fzf/zoxide/direnv
 ├─ zsh.nix (73)        aliases incl. drs/dru; sources ~/.zshrc.local

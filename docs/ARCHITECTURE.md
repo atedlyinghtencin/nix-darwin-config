@@ -52,8 +52,7 @@ a LAN name clash) still builds, and the switch sets the name back.
 | User | home-manager | dotfiles, CLI tools from nixpkgs, shell, git, ssh, VS Code settings | `modules/home/*` |
 
 nix-homebrew installs Homebrew into its default prefix (`/opt/homebrew`) from the Nix store
-(`autoMigrate` adopts a pre-existing install) and enables Rosetta for
-Intel-only casks. The `homebrew.*` options then generate a Brewfile that
+(`autoMigrate` adopts a pre-existing install). The `homebrew.*` options then generate a Brewfile that
 `brew bundle` applies on every switch.
 
 Nix itself is installed by the Determinate installer, which owns the daemon
