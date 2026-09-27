@@ -41,7 +41,7 @@ sudo -H darwin-rebuild switch --flake ~/.config/nix-darwin#redxiii < /dev/null
 
    It asks for your password once and keeps sudo alive for the run, installs
    the Xcode Command Line Tools (accept the dialog), Nix via the Determinate
-   installer, Rosetta 2 if missing, then builds and activates. The first run
+   installer, then builds and activates. The first run
    downloads and installs everything Homebrew, so it takes a while.
 4. If the script stops with "Reboot, then run ./bootstrap.sh again": the
    installer declared the `/nix` firmlink in `/etc/synthetic.conf`, and on a

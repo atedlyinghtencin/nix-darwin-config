@@ -28,7 +28,7 @@ The `vars` block is the only place machine identity lives:
 | `ghTokenRef` | `op://LLM Credentials/b4mybl4gutsmiz5hfwpbgztnfe/token` | `zsh.nix`: gives VS Code `GH_TOKEN` from 1Password at launch; a secret reference, not the token |
 | `opServiceAccountItem` | `op-service-account-llm` | `zsh.nix`: login keychain item holding a 1Password service-account token (read-only, that vault only); asks on every read. Either this or `ghTokenRef` empty turns it off |
 
-Other settings in the flake: nix-homebrew with Rosetta and `autoMigrate`;
+Other settings in the flake: nix-homebrew with `autoMigrate`;
 home-manager with `useGlobalPkgs`, `useUserPackages` and
 `backupFileExtension = "before-nix-darwin"`; `nix fmt` mapped to `nixfmt`.
 
@@ -53,7 +53,6 @@ precondition, so a second run only rebuilds. In order:
   `/nix` (prints the `diskutil apfs deleteVolume` and
   `security delete-generic-password` cleanup). The Nix profile is sourced
   first so a re-run does not mistake an installed Nix for a missing one
-- Rosetta 2 via `softwareupdate` when `oahd` is not running (Apple Silicon)
 - warns, and opens the Full Disk Access pane, when listing
   `~/Library/Safari` fails with "Operation not permitted" (the Safari step
   of the build needs the grant; nothing fails without it)
