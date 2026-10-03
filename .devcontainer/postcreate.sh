@@ -5,6 +5,11 @@ CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 mkdir -p "$CONFIG_DIR"
 cp "$(dirname "$0")/claude-settings.json" "$CONFIG_DIR/settings.json"
 
+# The Dockerfile installs Claude Code too, but that layer is cached: a rebuild
+# reuses whatever "latest" resolved to when the image was first built. This
+# runs on every create, so each rebuild starts on the current release.
+npm install -g @anthropic-ai/claude-code@latest
+
 # ECC rules must be copied manually; plugins can't distribute them
 tmp="$(mktemp -d)"
 git clone --depth 1 https://github.com/affaan-m/ECC "$tmp/ecc"
