@@ -69,6 +69,7 @@ in
       "adobe-creative-cloud"
       "appcleaner"
       "claude"
+      "godot"
       "google-chrome"
       "itsytv"
       "kdenlive"
