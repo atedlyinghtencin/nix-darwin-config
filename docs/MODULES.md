@@ -120,7 +120,7 @@ owns the install and never aborts the rebuild.
 |---|---|
 | `taps` | `openai/tools` (trusted, for tart + softnet) |
 | `brews` (15) | ansible, ansible-lint, cloudflared, f3, ffmpeg, mas, nmap, node, node@22, poppler, qrencode, openai/tools/tart, tcpdump, yamllint, yt-dlp |
-| `casks` (21) | 1password, 1password-cli, adobe-creative-cloud, appcleaner, claude, google-chrome, itsytv, kdenlive, libreoffice, orbstack, proton-drive, proton-mail, proton-pass, protonvpn, royal-tsx, visual-studio-code, vlc, wireshark-app, discord, dropbox, firefox |
+| `casks` (22) | 1password, 1password-cli, adobe-creative-cloud, appcleaner, claude, godot, google-chrome, itsytv, kdenlive, libreoffice, orbstack, proton-drive, proton-mail, proton-pass, protonvpn, royal-tsx, visual-studio-code, vlc, wireshark-app, discord, dropbox, firefox |
 | `vscode` (8) | rainbow-csv, Python (debugpy, python, pylance, python-envs), Remote Containers, Makefile Tools, Markdown All in One |
 | `masApps` | none (Keynote, Numbers, Pages commented out) |
 

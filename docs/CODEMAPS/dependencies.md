@@ -15,7 +15,7 @@ user     git wget uv ripgrep fd bat eza jq tree htop gh nixfmt nil defaultbrowse
 ## Homebrew (modules/darwin/homebrew.nix)
 tap      openai/tools (trusted)
 brews    ansible ansible-lint cloudflared f3 ffmpeg mas nmap node node@22 poppler qrencode openai/tools/tart tcpdump yamllint yt-dlp
-casks    1password 1password-cli adobe-creative-cloud appcleaner claude google-chrome itsytv kdenlive libreoffice orbstack
+casks    1password 1password-cli adobe-creative-cloud appcleaner claude godot google-chrome itsytv kdenlive libreoffice orbstack
          proton-drive proton-mail proton-pass protonvpn royal-tsx visual-studio-code vlc wireshark-app discord dropbox firefox
 vscode   mechatroner.rainbow-csv ms-python.{debugpy,python,vscode-pylance,vscode-python-envs} ms-vscode-remote.remote-containers
          ms-vscode.makefile-tools yzhang.markdown-all-in-one
